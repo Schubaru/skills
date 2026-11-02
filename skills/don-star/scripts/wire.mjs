@@ -168,9 +168,10 @@ export default function App() {
     }
   }
   if (blocks.length) {
-    const i = s.indexOf("defineConfig({");
-    if (i >= 0) s = s.slice(0, i + "defineConfig({".length) + "\n" + blocks.join("\n") + s.slice(i + "defineConfig({".length);
-    else manual.push("vite.config: add the server.watch / build.keepNames / resolve.alias blocks by hand (no defineConfig({ found).");
+    // defineConfig({ … }), or the function forms defineConfig(() => ({ … })) and defineConfig(async ({ mode }) => ({ … }))
+    const m = s.match(/defineConfig\(\s*(?:(?:async\s*)?(?:\([^)]*\)|\w+)\s*=>\s*\(\s*)?\{/);
+    if (m) s = s.slice(0, m.index + m[0].length) + "\n" + blocks.join("\n") + s.slice(m.index + m[0].length);
+    else manual.push("vite.config: add the server.watch / build.keepNames / resolve.alias blocks by hand (no `defineConfig({` or `defineConfig(() => ({` found).");
   }
   if (s !== before) write(f, s, `${path.basename(f)}: plugins, watch ignore, keepNames, @ alias`);
 }
