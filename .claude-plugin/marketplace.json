@@ -64,12 +64,12 @@
       ]
     },
     {
-      "name": "gauntlet-loop",
-      "description": "Turns any goal into a builder-versus-critic prompt that loops until the work clears a bar.",
+      "name": "noob-inc",
+      "description": "Deploys N00B Inc into your own accounts: a pixel office and board for your Claude Code agents, with an inbox for their permission prompts.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/gauntlet-loop"
+        "./skills/noob-inc"
       ]
     },
     {

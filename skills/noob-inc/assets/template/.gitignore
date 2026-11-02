@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.vercel/
+graft/
+.impeccable/mocks/
+.impeccable/review/
+.DS_Store
+.vercel
+
+# Claude Code session worktrees
+.claude/worktrees/
+dist/

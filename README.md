@@ -10,7 +10,7 @@ Claude Code skills I use every day, packaged so you can too. Each one is a folde
 | [key-components](skills/key-components) | Builds or reverse-engineers a complete design system: tokens, components, stories, docs. |
 | [test-mite](skills/test-mite) | Deterministic routing tests: Playwright coverage of every route, plus a findings report. |
 | [app-store](skills/app-store) | Audits an iOS app against Apple's current review guidelines, fixes what it safely can, reports the rest. |
-| [gauntlet-loop](skills/gauntlet-loop) | Turns any goal into a builder-versus-critic prompt that loops until the work clears a bar. |
+| [noob-inc](skills/noob-inc) | Deploys N00B Inc into your own accounts: a pixel office and board for your Claude Code agents, with an inbox for their permission prompts. |
 | [last-push](skills/last-push) | Your latest git push as a short, Slack-ready bullet list. |
 
 ## Install
