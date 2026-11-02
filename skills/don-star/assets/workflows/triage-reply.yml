@@ -1,0 +1,43 @@
+# Answer the review-board threads when a triage PR lands on main.
+#
+# the reviewer's rule (2026-07-30): a thread is answered once the change has SHIPPED, never while it is
+# still a proposal. The daily triage routine writes each reply into __DS_APP_DIR__/review-triage.json
+# when it opens the PR; this posts them at the moment of merge and not before.
+#
+# Setup (one time): add the repo secret REVIEW_TRIAGE_TOKEN =
+# review_notify_config.triage_token — the same scoped token the routine uses. It can read board
+# threads, email the reviewer, and append agent replies; it is not the Supabase service key and cannot
+# do anything else.
+
+name: Review triage replies
+
+on:
+  pull_request:
+    types: [closed]
+
+# Nothing in the repo is touched — the only side effect is an HTTP call to the Edge Function.
+permissions:
+  contents: read
+
+jobs:
+  reply:
+    # Merged (not just closed), and only for the routine's own branches.
+    if: >-
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'triage/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The merge commit, so the ledger read here is the one that actually landed.
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Post board replies
+        env:
+          TRIAGE_TOKEN: ${{ secrets.REVIEW_TRIAGE_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node __DS_APP_DIR__/scripts/triage-reply.mjs

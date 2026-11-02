@@ -1,0 +1,221 @@
+/* The manage-access console (2026-09-18).
+ *
+ * Board grammar, not the product design system: rv- variables only, no hex.
+ * One real <table> per tab, because this is a list of records with the same
+ * columns and reading DOWN a column is the whole job. At phone width each row
+ * folds into a stacked block carrying its own labels (td::before), so nothing
+ * scrolls sideways and a screen reader still hears a table. */
+
+.rv-adm-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* The shell's page is a scrolling flex column: without this its children shrink
+   to fit and the card's overflow:hidden clips the table instead of scrolling. */
+.rv-folder-root .rv-page.is-narrow > * { flex-shrink: 0; }
+
+/* --- tabs ---------------------------------------------------------------- */
+
+.rv-adm-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-bottom: 1.5px solid var(--rv-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rv-adm-tabs::-webkit-scrollbar { display: none; }
+.rv-adm-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 9px 12px;
+  margin-bottom: -1.5px;
+  border-bottom: 2px solid transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--rv-muted-strong);
+  transition: color var(--rv-fast) var(--rv-ease), border-color var(--rv-fast) var(--rv-ease);
+}
+.rv-adm-tab:hover { color: var(--rv-fg); }
+/* Weight and a rule, never colour alone. */
+.rv-adm-tab.is-on { color: var(--rv-fg); font-weight: 600; border-bottom-color: var(--rv-fg); }
+.rv-adm-badge {
+  min-width: 18px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rv-needs) 25%, var(--rv-muted));
+  color: var(--rv-fg);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* --- the table ----------------------------------------------------------- */
+
+.rv-adm-card {
+  border: 1.5px solid var(--rv-border);
+  border-radius: 18px;
+  background: var(--rv-card);
+  overflow: hidden;
+}
+.rv-adm-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.rv-adm-table th {
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rv-muted-strong);
+  padding: 11px 16px;
+  border-bottom: 1.5px solid var(--rv-border);
+  white-space: nowrap;
+}
+.rv-adm-table td { padding: 12px 16px; border-bottom: 1px solid var(--rv-border); vertical-align: middle; }
+.rv-adm-table tbody tr:last-child td { border-bottom: none; }
+.rv-adm-table tbody tr:hover { background: color-mix(in srgb, var(--rv-muted) 45%, transparent); }
+.rv-adm-table td.is-actions { text-align: right; white-space: nowrap; }
+
+.rv-adm-name { font-weight: 600; letter-spacing: -0.01em; }
+/* A person wears their profile look (person.tsx); unknown, a plain letter. */
+.rv-adm-person { display: flex; align-items: flex-start; gap: 10px; }
+.rv-adm-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--rv-muted);
+  color: var(--rv-muted-strong);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+}
+.rv-adm-avatar.is-emoji { font-size: 16px; }
+.rv-adm-avatar.is-large { width: 48px; height: 48px; margin-bottom: 12px; font-size: 19px; }
+.rv-adm-avatar.is-large.is-emoji { font-size: 26px; }
+.rv-adm-name.is-anon { font-weight: 500; color: var(--rv-muted-strong); }
+.rv-adm-sub { display: block; margin-top: 2px; font-size: 12px; color: var(--rv-muted-strong); }
+.rv-adm-mono { font-size: 12.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+.rv-adm-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.rv-adm-link { color: inherit; text-decoration: none; }
+.rv-adm-link:hover { text-decoration: underline; }
+
+.rv-adm-empty {
+  padding: 40px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--rv-muted-strong);
+}
+.rv-adm-note {
+  padding: 12px 16px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--rv-needs) 45%, var(--rv-fg));
+  background: color-mix(in srgb, var(--rv-needs) 8%, transparent);
+  border-bottom: 1px solid var(--rv-border);
+}
+
+/* --- search and add ------------------------------------------------------ */
+
+.rv-adm-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rv-adm-search { flex: 1; min-width: 180px; }
+.rv-adm-addform { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; }
+.rv-adm-addform .rv-adm-entry { flex: 2; min-width: 220px; }
+.rv-adm-addform .rv-adm-person { flex: 1; min-width: 160px; }
+.rv-adm-hint { flex-basis: 100%; font-size: 12.5px; color: var(--rv-muted-strong); }
+
+/* Where a project is filed, inline in the table. A native select, so it is one
+   tap on a phone and one keystroke everywhere else. */
+.rv-adm-select { max-width: 200px; padding-right: 8px; cursor: pointer; }
+
+/* Destructive, and shaped like it: the outline carries the colour rather than
+   a filled red button that invites the press. */
+.rv-adm-danger { align-self: flex-start; width: auto; color: var(--rv-broken); }
+.rv-adm-danger:hover { background: color-mix(in srgb, var(--rv-broken) 10%, transparent); }
+
+/* --- project rows -------------------------------------------------------- */
+
+.rv-adm-thumb {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid var(--rv-border);
+  background: var(--rv-muted);
+  color: var(--rv-muted-strong);
+  font-size: 13px;
+  font-weight: 600;
+}
+.rv-adm-prow { display: flex; align-items: center; gap: 12px; }
+
+/* --- requests ------------------------------------------------------------ */
+
+.rv-adm-reqs { list-style: none; margin: 0; padding: 0; }
+.rv-adm-reqs > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rv-border);
+}
+.rv-adm-reqs > li:last-child { border-bottom: none; }
+.rv-adm-reqs > li.is-decided { color: var(--rv-muted-strong); }
+.rv-adm-reqmain { flex: 1; min-width: 200px; }
+.rv-adm-msg { margin-top: 4px; font-size: 12.5px; color: var(--rv-muted-strong); line-height: 1.5; }
+
+/* --- the per-user checklist ---------------------------------------------- */
+
+.rv-adm-checks { list-style: none; margin: 0; padding: 0; }
+.rv-adm-checks > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rv-border);
+}
+.rv-adm-checks > li:last-child { border-bottom: none; }
+.rv-adm-checks input { margin-top: 2px; width: 15px; height: 15px; flex-shrink: 0; accent-color: var(--rv-fg); }
+.rv-adm-checkbody { min-width: 0; }
+
+/* --- phone: every table folds into stacked rows -------------------------- */
+
+@media (max-width: 720px) {
+  .rv-adm-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .rv-adm-table tbody tr {
+    display: block;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rv-border);
+  }
+  .rv-adm-table tbody tr:last-child { border-bottom: none; }
+  .rv-adm-table td {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: none;
+  }
+  .rv-adm-table td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--rv-muted-strong);
+  }
+  .rv-adm-table td.is-actions { justify-content: flex-start; padding-top: 8px; }
+  .rv-adm-table td.is-actions::before { content: none; }
+  .rv-adm-chips { justify-content: flex-end; }
+}

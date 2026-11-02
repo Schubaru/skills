@@ -1,0 +1,533 @@
+<title>REPLACE — a short, specific name for this audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<!--
+  FINDINGS TEMPLATE for the routing skill. Fill in, don't start over.
+  The parts worth keeping are the token structure (all three theme states), the chips, the
+  finding cards and the link rows. The palette should suit the subject — pick one deliberately
+  rather than shipping this one by default.
+-->
+
+<style>
+  :root {
+    --ground:#FBFCFD; --surface:#FFF; --surface-2:#F4F7FA;
+    --ink:#0F1729; --ink-2:#3D4A63; --ink-3:#6B7A93;
+    --rule:#E2E8F1; --rule-2:#EDF1F6;
+    --accent:#1F5FE0; --accent-soft:#E8F0FE;
+    --pass:#04785A; --pass-soft:#E1F5EE;
+    --fail:#B42318; --fail-soft:#FDECEA;
+    --watch:#A9620A; --watch-soft:#FDF2E3;
+    --idle:#6B7A93; --idle-soft:#EDF1F6;
+    --shadow:0 1px 2px rgba(15,23,41,.05), 0 8px 24px -12px rgba(15,23,41,.14);
+  }
+  /* System-dark (nothing stamped on :root) — guarded so an explicit light choice still wins. */
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --ground:#0A0F1C; --surface:#111828; --surface-2:#161F33;
+      --ink:#EAF0F8; --ink-2:#B4C1D6; --ink-3:#8394AE;
+      --rule:#23304A; --rule-2:#1B2740;
+      --accent:#7FA8FF; --accent-soft:#17253F;
+      --pass:#5BD6AF; --pass-soft:#0E2A24;
+      --fail:#FF9C90; --fail-soft:#331714;
+      --watch:#F0B267; --watch-soft:#2E2110;
+      --idle:#8394AE; --idle-soft:#1B2740;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  /* Explicit dark choice — so the toggle wins in both directions. */
+  :root[data-theme="dark"] {
+    --ground:#0A0F1C; --surface:#111828; --surface-2:#161F33;
+    --ink:#EAF0F8; --ink-2:#B4C1D6; --ink-3:#8394AE;
+    --rule:#23304A; --rule-2:#1B2740;
+    --accent:#7FA8FF; --accent-soft:#17253F;
+    --pass:#5BD6AF; --pass-soft:#0E2A24;
+    --fail:#FF9C90; --fail-soft:#331714;
+    --watch:#F0B267; --watch-soft:#2E2110;
+    --idle:#8394AE; --idle-soft:#1B2740;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:15px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:60rem; margin:0 auto; padding:3rem 1.5rem 6rem; }
+
+  .mast { display:flex; flex-direction:column; gap:.75rem; padding-bottom:1.75rem; border-bottom:1px solid var(--rule); }
+  .eyebrow { font-family:"IBM Plex Mono",monospace; font-size:.6875rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+  h1 { font-family:Manrope,sans-serif; font-weight:800; font-size:clamp(2rem,5vw,2.75rem); line-height:1.1; letter-spacing:-.025em; margin:0; text-wrap:balance; }
+  .lede { margin:0; color:var(--ink-2); font-size:1.0625rem; max-width:58ch; }
+  .meta { display:flex; flex-wrap:wrap; gap:.4rem 1.25rem; margin-top:.5rem; font-family:"IBM Plex Mono",monospace; font-size:.75rem; color:var(--ink-3); }
+  .meta b { color:var(--ink-2); font-weight:500; }
+
+  .live { display:flex; align-items:center; gap:.625rem; margin-top:1.5rem; padding:.625rem .875rem; border-radius:.625rem; background:var(--accent-soft); color:var(--accent); font-size:.8125rem; font-weight:600; }
+  .live.done { background:var(--pass-soft); color:var(--pass); }
+  .dot { width:.5rem; height:.5rem; border-radius:50%; background:currentColor; flex:none; animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+  @media (prefers-reduced-motion: reduce) { .dot { animation:none; } }
+
+  section { margin-top:3rem; }
+  h2 { font-family:Manrope,sans-serif; font-weight:700; font-size:1.375rem; letter-spacing:-.015em; margin:0 0 .375rem; text-wrap:balance; }
+  .sub { margin:0 0 1.25rem; color:var(--ink-3); font-size:.9375rem; max-width:62ch; }
+  .linknote { margin:0 0 1.25rem; color:var(--ink-3); font-size:.8125rem; }
+
+  .board { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:.75rem; }
+  .stat { background:var(--surface); border:1px solid var(--rule); border-radius:.75rem; padding:1rem 1.125rem; box-shadow:var(--shadow); }
+  .stat .n { font-family:Manrope,sans-serif; font-weight:800; font-size:2rem; line-height:1.05; letter-spacing:-.03em; font-variant-numeric:tabular-nums; display:block; }
+  .stat .k { font-family:"IBM Plex Mono",monospace; font-size:.6875rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-top:.25rem; display:block; }
+  .stat.is-pass .n{color:var(--pass)} .stat.is-fail .n{color:var(--fail)} .stat.is-watch .n{color:var(--watch)}
+
+  .chip { display:inline-flex; align-items:center; gap:.3rem; font-family:"IBM Plex Mono",monospace; font-size:.6875rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:.1875rem .5rem; border-radius:.3125rem; white-space:nowrap; }
+  .chip.pass{background:var(--pass-soft);color:var(--pass)} .chip.fail{background:var(--fail-soft);color:var(--fail)}
+  .chip.watch{background:var(--watch-soft);color:var(--watch)} .chip.idle{background:var(--idle-soft);color:var(--idle)}
+
+  code { font-family:"IBM Plex Mono",monospace; font-size:.8125em; background:var(--surface-2); border:1px solid var(--rule-2); padding:.0625rem .3125rem; border-radius:.25rem; color:var(--ink-2); }
+
+  .finds { display:flex; flex-direction:column; gap:1rem; }
+  .find { background:var(--surface); border:1px solid var(--rule); border-radius:.875rem; padding:1.25rem 1.375rem; box-shadow:var(--shadow); border-left:3px solid var(--idle); }
+  .find.sev-fail{border-left-color:var(--fail)} .find.sev-watch{border-left-color:var(--watch)} .find.sev-pass{border-left-color:var(--pass)}
+  .find h3 { font-family:Manrope,sans-serif; font-weight:700; font-size:1.0625rem; margin:0 0 .5rem; letter-spacing:-.01em; text-wrap:balance; }
+  .find p { margin:0 0 .625rem; color:var(--ink-2); font-size:.9375rem; }
+  .find p:last-child { margin-bottom:0; }
+  .hd { display:flex; flex-wrap:wrap; align-items:center; gap:.625rem; margin-bottom:.5rem; }
+
+  /* Evidence detail — collapsed by default. A page of findings has to be skimmable: the
+     header (chips + headline) and the footer (why it matters + links) always read, and the
+     expected/actual/root-cause block opens only for the reader who wants to verify it.
+     Native <details> so it works with no script, prints, and is keyboard-operable for free. */
+  .find details { margin:.75rem 0 .875rem; border:1px solid var(--rule-2); border-radius:.625rem; background:var(--surface-2); }
+  .find summary { cursor:pointer; list-style:none; display:flex; align-items:center; gap:.45rem; padding:.5625rem .875rem; border-radius:.625rem; font-family:"IBM Plex Mono",monospace; font-size:.6875rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
+  .find summary::-webkit-details-marker { display:none; }
+  .find summary::before { content:"\203A"; font-size:1rem; line-height:0; color:var(--ink-3); transition:transform .15s ease; }
+  .find details[open] summary::before { transform:rotate(90deg); }
+  .find summary:hover, .find summary:focus-visible { color:var(--accent); }
+  .find summary:hover::before, .find summary:focus-visible::before { color:var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .find summary::before { transition:none; } }
+
+  /* Filter tabs. One row, scrollable on narrow screens rather than wrapping into a block that
+     pushes the findings off the fold. Counts are rendered by script from the cards themselves. */
+  .tabs { display:flex; gap:.375rem; margin:.875rem 0 1.25rem; overflow-x:auto; scrollbar-width:none; padding-bottom:.125rem; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab { flex:none; display:inline-flex; align-items:center; gap:.4rem; cursor:pointer; font-family:"IBM Plex Mono",monospace; font-size:.6875rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:.3125rem .625rem; border-radius:.375rem; background:var(--surface); border:1px solid var(--rule); color:var(--ink-3); }
+  .tab:hover { color:var(--ink-2); border-color:var(--ink-3); }
+  .tab .n { font-variant-numeric:tabular-nums; color:var(--ink-3); background:var(--surface-2); border-radius:.1875rem; padding:0 .3125rem; }
+  .tab[aria-selected="true"] { background:var(--ink); border-color:var(--ink); color:var(--ground); }
+  .tab[aria-selected="true"] .n { background:rgba(255,255,255,.18); color:inherit; }
+  .tab:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .find[hidden] { display:none; }
+  .ev { margin:0; padding:0 .875rem .875rem; }
+  .ev dt { font-family:"IBM Plex Mono",monospace; font-size:.6875rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-top:.875rem; }
+  .ev dd { margin:.1875rem 0 0; color:var(--ink-2); font-size:.9375rem; }
+
+  /* Evidence links — every finding and every walked screen gets these. */
+  .links { display:flex; flex-wrap:wrap; gap:.375rem; margin-top:.875rem; padding-top:.875rem; border-top:1px solid var(--rule-2); }
+  .lnk { display:inline-flex; align-items:center; gap:.3rem; text-decoration:none; font-family:"IBM Plex Mono",monospace; font-size:.6875rem; font-weight:600; padding:.25rem .5rem; border-radius:.3125rem; background:var(--surface-2); border:1px solid var(--rule); color:var(--ink-2); }
+  .lnk:hover, .lnk:focus-visible { border-color:var(--accent); color:var(--accent); }
+  .lnk .k { color:var(--ink-3); font-weight:500; }
+  .lnk.is-board { background:var(--accent-soft); border-color:transparent; color:var(--accent); }
+  .lnk.is-board .k { color:var(--accent); opacity:.7; }
+
+  .log { display:flex; flex-direction:column; border-top:1px solid var(--rule); }
+  .row { display:grid; grid-template-columns:1.5rem 8.5rem 1fr auto; gap:.875rem; align-items:baseline; padding:.8125rem .25rem; border-bottom:1px solid var(--rule-2); }
+  .row .i { font-family:"IBM Plex Mono",monospace; font-size:.75rem; color:var(--ink-3); font-variant-numeric:tabular-nums; }
+  .row .step { font-family:"IBM Plex Mono",monospace; font-size:.8125rem; font-weight:600; color:var(--accent); overflow-wrap:anywhere; }
+  .row .step a { color:inherit; text-decoration:none; border-bottom:1px dotted currentColor; }
+  .row .step a:hover { color:var(--accent); }
+  .row .what { color:var(--ink-2); font-size:.9375rem; }
+  .row .what em { color:var(--ink); font-style:normal; font-weight:600; }
+  @media (max-width:40rem) { .row{grid-template-columns:1.25rem 1fr auto} .row .what{grid-column:2/-1} }
+
+  .scroll { overflow-x:auto; }
+
+  /* Runs — one full view per pass, so a fix never erases the report that found it.
+     Tabs carry their own headline numbers: the delta is the reason this control exists,
+     and a switcher whose labels are just "Run 1 / Run 2" makes the reader click to find it. */
+  .runs { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1.75rem; }
+  .run-tab { flex:1 1 12rem; display:flex; flex-direction:column; gap:.1875rem; padding:.6875rem .875rem;
+    border:1px solid var(--rule); border-radius:.625rem; background:var(--surface); color:var(--ink-2);
+    font:inherit; text-align:left; cursor:pointer; transition:border-color .15s, background .15s; }
+  .run-tab:hover { border-color:var(--ink-3); }
+  .run-tab.is-on { border-color:var(--accent); background:var(--accent-soft); color:var(--ink); }
+  .run-tab .rt-n { font-size:.6875rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+  .run-tab.is-on .rt-n { color:var(--accent); }
+  .run-tab .rt-l { font-size:.9375rem; font-weight:650; color:var(--ink); }
+  .run-tab .rt-s { font-size:.8125rem; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+  .run-tab .rt-s b { font-weight:700; }
+  .run-tab .rt-s .fail { color:var(--fail); } .run-tab .rt-s .pass { color:var(--pass); }
+  .run-tab:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  /* The run being read is announced, not just styled — "which one am I looking at" must not
+     depend on noticing a border colour. */
+  .run-was { margin-top:1.25rem; padding:.625rem .875rem; border-radius:.625rem; border:1px dashed var(--rule);
+    color:var(--ink-2); font-size:.8125rem; }
+  .run-was b { color:var(--ink); font-weight:650; }
+  /* Scenarios — one level below the run. A pass that walks several user scenarios (personas,
+     account states, entry points) gives each its own status · scoreboard · findings · walk log,
+     so a reader who owns one scenario never scrolls through the other eight. Quieter than the
+     run tabs on purpose: the run is "when", the scenario is "who", and "when" outranks it. */
+  .scenarios { display:flex; flex-wrap:wrap; gap:.375rem; margin-top:1.25rem; padding-bottom:.75rem; border-bottom:1px solid var(--rule); }
+  .sc-tab { display:inline-flex; align-items:center; gap:.4375rem; padding:.4375rem .75rem; border:1px solid var(--rule);
+    border-radius:999px; background:transparent; color:var(--ink-2); font:inherit; font-size:.8125rem; font-weight:600;
+    cursor:pointer; transition:border-color .15s, background .15s; }
+  .sc-tab:hover { border-color:var(--ink-3); }
+  .sc-tab[aria-selected="true"] { border-color:var(--ink); background:var(--ink); color:var(--surface); }
+  .sc-tab .n { font-variant-numeric:tabular-nums; font-weight:700; opacity:.75; }
+  .sc-tab .n.fail { color:var(--fail); opacity:1; }
+  .sc-tab[aria-selected="true"] .n.fail { color:inherit; }
+  .sc-tab:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .sc-who { margin-top:1rem; color:var(--ink-2); font-size:.9375rem; }
+  .sc-who b { color:var(--ink); font-weight:650; }
+  footer { margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--rule); color:var(--ink-3); font-size:.8125rem; }
+  a { color:var(--accent); }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <span class="eyebrow">PROJECT · AREA UNDER TEST</span>
+    <h1>REPLACE — the audit's name</h1>
+    <p class="lede">One sentence on what was walked and how — pressing real controls, or deep-linking, or both.</p>
+    <div class="meta">
+      <span><b>Route</b> /the/route</span>
+      <span><b>Viewport</b> 390 × 844</span>
+      <span><b>Server</b> localhost:PORT</span>
+      <span><b>Branch</b> branch-name</span>
+    </div>
+  </header>
+
+  <!--
+    RUNS. Delete this nav and the wrappers below if there has only ever been one pass — a
+    switcher with one option is furniture. Add a tab and a matching .run the first time you
+    re-walk after fixes, and keep the earlier run's content EXACTLY as it was written: it is
+    the record of what the flow did before anyone touched it, and editing it to agree with
+    the fix is how a report quietly stops being evidence.
+    Tab order is oldest → newest; the page opens on the newest.
+  -->
+  <nav class="runs" aria-label="Test runs">
+    <button class="run-tab" data-go="run-1" type="button">
+      <span class="rt-n">Run 1 · DATE</span>
+      <span class="rt-l">Initial walk</span>
+      <span class="rt-s"><b class="fail">0</b> defects · <b>0</b> screens</span>
+    </button>
+    <button class="run-tab" data-go="run-2" type="button">
+      <span class="rt-n">Run 2 · DATE</span>
+      <span class="rt-l">After fixes</span>
+      <span class="rt-s"><b class="pass">0</b> fixed · <b class="fail">0</b> open</span>
+    </button>
+  </nav>
+
+  <!-- ============================ RUN 1 — as first reported ============================ -->
+  <div class="run" data-run="run-1" hidden>
+
+  <p class="run-was">You are reading <b>the initial walk</b>, as it stood before any fix. What
+    the flow does now is on Run&nbsp;2.</p>
+
+  <!--
+    SCENARIOS — optional, one level BELOW the run. Use it when the pass walked several user
+    scenarios (personas, account states, entry points) and a reader will want one at a time.
+    One tab per scenario, in the order they were walked; each tab's number is that scenario's
+    open defects (class="n fail" when above zero). Each .scenario wrapper holds its OWN status ·
+    scoreboard · findings · walk log. Findings that belong to no single scenario (the harness,
+    a suite-wide drift) go in a last scenario named "Whole suite", not duplicated into each.
+    Delete the nav and unwrap the blocks if there is only one scenario — the script hides a
+    one-tab nav anyway. The hash carries both levels: #run-1/scenario-id.
+  -->
+  <nav class="scenarios" role="tablist" aria-label="User scenarios">
+    <button class="sc-tab" role="tab" type="button" data-scenario="scenario-a">Scenario A <span class="n">0</span></button>
+    <button class="sc-tab" role="tab" type="button" data-scenario="scenario-b">Scenario B <span class="n fail">0</span></button>
+  </nav>
+
+  <div class="scenario" data-scenario="scenario-a">
+  <p class="sc-who"><b>Who this is.</b> One sentence: the person, the state they arrive in, and what the product owes them.</p>
+
+  <!-- While running: class="live". When finished: class="live done" with a ✓ and the result. -->
+  <div class="live"><span class="dot"></span> Walk in progress — this page updates as I go</div>
+
+  <section>
+    <h2>Where it stands</h2>
+    <div class="board">
+      <div class="stat"><span class="n">0</span><span class="k">Screens</span></div>
+      <div class="stat is-pass"><span class="n">0</span><span class="k">Passed</span></div>
+      <div class="stat is-fail"><span class="n">0</span><span class="k">Defects</span></div>
+      <div class="stat is-watch"><span class="n">0</span><span class="k">Noted</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Findings</h2>
+    <p class="sub">Each classified before anything is touched: an app bug is the flow breaking its
+      own stated rules, drift is a rule that changed on purpose, environment is the harness.</p>
+
+    <!-- Filter tabs. Built by script from the cards' own data-kind, so a tab can never promise a
+         category the page doesn't have. "All" leads and is the default: a reader arriving at a
+         filtered page can't see the shape of the result, and anything hidden is invisible to
+         in-page find. -->
+    <div class="tabs" role="tablist" aria-label="Filter findings"></div>
+
+    <div class="finds" role="tabpanel" aria-label="Findings">
+
+      <!-- data-kind is the ONE taxonomy the tabs filter on: defect · noted · held-up ·
+           expected-gap · environment · drift. Exactly one per card. The classification chip
+           beside it (app bug / board / clinical) is a second, freer fact. -->
+      <div class="find sev-fail" data-kind="defect">
+        <div class="hd"><span class="chip fail">defect</span><span class="chip idle">app bug</span></div>
+        <h3>What is wrong, said as a fact about the product</h3>
+        <!-- Collapsed by default. Drop rows that don't apply; don't pad them with filler. -->
+        <details>
+          <summary>Expected, actual, root cause</summary>
+          <dl class="ev">
+            <dt>Expected</dt><dd>The rule the flow states about itself.</dd>
+            <dt>Actual</dt><dd>What the run did instead, quoted rather than paraphrased.</dd>
+            <dt>Root cause</dt><dd>The line or logic responsible, if it was found.</dd>
+            <dt>Bound</dt><dd>What does <em>not</em> reproduce it — the limit of the blast radius.</dd>
+          </dl>
+        </details>
+        <p><strong>Why it matters:</strong> in the product's terms, not the test's.</p>
+        <div class="links">
+          <a class="lnk is-board" href="BOARD_URL#frame-id" target="_blank" rel="noopener"><span class="k">frame</span> frame-id</a>
+          <a class="lnk" href="APP_URL?seeded=state" target="_blank" rel="noopener"><span class="k">screen</span> the broken case</a>
+          <a class="lnk" href="APP_URL?other=state" target="_blank" rel="noopener"><span class="k">screen</span> the working case</a>
+        </div>
+      </div>
+
+      <div class="find sev-pass" data-kind="held-up">
+        <div class="hd"><span class="chip pass">held up</span></div>
+        <h3>What behaved exactly as specified</h3>
+        <p>List the behaviors now pinned — this is what stops a reader over-reading the damage.</p>
+        <div class="links"><a class="lnk" href="APP_URL" target="_blank" rel="noopener"><span class="k">screen</span> a key one</a></div>
+      </div>
+
+      <div class="find sev-watch" data-kind="noted">
+        <div class="hd"><span class="chip watch">noted</span><span class="chip idle">app bug</span></div>
+        <h3>Something real but small, or narrower than it first looked</h3>
+        <details>
+          <summary>Expected, actual, root cause</summary>
+          <dl class="ev">
+            <dt>Expected</dt><dd>The rule.</dd>
+            <dt>Actual</dt><dd>What happened.</dd>
+            <dt>Bound</dt><dd>What does <em>not</em> reproduce it — often the whole reason this is
+              "noted" rather than "defect".</dd>
+          </dl>
+        </details>
+        <p><strong>Why it matters:</strong> say plainly why it is worth someone's time anyway.</p>
+      </div>
+
+      <div class="find" data-kind="expected-gap">
+        <div class="hd"><span class="chip idle">expected gap</span></div>
+        <h3>Known open items, confirmed rather than filed</h3>
+        <p>Behaviour the plan already predicted would be missing. Recording what the app actually
+          does keeps a known gap from being rediscovered as a bug next quarter.</p>
+      </div>
+
+      <div class="find" data-kind="environment">
+        <div class="hd"><span class="chip idle">environment</span></div>
+        <h3>Harness problems, named so they aren't mistaken for the app</h3>
+        <p>Keep these separate. A reader must never guess whether a line is about their product.</p>
+      </div>
+
+      <div class="find sev-watch" data-kind="drift">
+        <div class="hd"><span class="chip watch">drift</span><span class="chip idle">awaiting sign-off</span></div>
+        <h3>A test encoding behaviour the product deliberately changed</h3>
+        <details>
+          <summary>Expected, actual, root cause</summary>
+          <dl class="ev">
+            <dt>Expected by the test</dt><dd>The old rule.</dd>
+            <dt>Actual</dt><dd>The new behaviour, and the commit or decision that changed it.</dd>
+          </dl>
+        </details>
+        <p><strong>What I did not do:</strong> update it. Name the smallest change that would
+          re-align the test, and leave the call to the reader.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>The walk</h2>
+    <p class="sub">One row per screen actually reached, in the order the flow served it.</p>
+    <p class="linknote">Every step id is a link that opens that exact screen on the dev server
+      (<code>localhost:PORT</code>), seeded to the state described.</p>
+    <div class="scroll">
+      <div class="log">
+        <div class="row">
+          <span class="i">1</span>
+          <span class="step"><a href="APP_URL" target="_blank" rel="noopener">step-id</a></span>
+          <span class="what">What rendered, and anything notable.</span>
+          <span class="chip pass">ok</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Scope</h2>
+    <div class="finds">
+      <div class="find">
+        <p><strong>In:</strong> …</p>
+        <p><strong>Out:</strong> …  Gaps stated plainly beat gaps implied.</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /scenario-a -->
+
+  <div class="scenario" data-scenario="scenario-b" hidden>
+    <!-- who · status · scoreboard · findings · walk log for this scenario -->
+  </div><!-- /scenario-b -->
+
+  </div><!-- /run-1 -->
+
+  <!-- ======================= RUN 2 — the re-walk after the fixes ======================= -->
+  <!--
+    Copy the four blocks above (status · scoreboard · findings · walk log) and fill them with
+    what the RE-WALK found, not with edits to run 1. A defect that is fixed keeps its card here
+    and gains a "fixed" chip plus the evidence that it is: what the re-walk actually did, and
+    what now pins it. A defect still open keeps its severity — a second run is not a reason to
+    soften it.
+  -->
+  <div class="run" data-run="run-2">
+    <div class="live done"><span class="dot"></span> Re-walked after fixes — N of M closed, K still open</div>
+    <!-- status · scoreboard · findings · walk log for this run go here -->
+  </div><!-- /run-2 -->
+
+  <footer>How this run was produced · what was and wasn't changed in the repo</footer>
+
+</div>
+
+<script>
+  (function () {
+    var $$ = function (root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); };
+
+    /* ---- Kind filter, once per findings list -------------------------------------------------
+       Scoped to its own section: a page holds one findings list per run (and per scenario), so
+       nothing here may reach for an id. The tab selection stays out of the URL — the hash
+       belongs to the run and the scenario. */
+    var KINDS = [
+      ['defect', 'Defects'],
+      ['noted', 'Noted'],
+      ['held-up', 'Held up'],
+      ['expected-gap', 'Expected gaps'],
+      ['environment', 'Environment'],
+      ['drift', 'Drift']
+    ];
+
+    var arrows = function (listEl, sel) {
+      // Arrow keys move between tabs, as a tablist is expected to.
+      listEl.addEventListener('keydown', function (e) {
+        var keys = { ArrowLeft: -1, ArrowRight: 1, Home: 'first', End: 'last' };
+        if (!(e.key in keys)) return;
+        var all = $$(listEl, sel);
+        var i = all.indexOf(document.activeElement);
+        if (i < 0) return;
+        e.preventDefault();
+        var next = keys[e.key] === 'first' ? 0
+          : keys[e.key] === 'last' ? all.length - 1
+          : (i + keys[e.key] + all.length) % all.length;
+        all[next].focus();
+        all[next].click();
+      });
+    };
+
+    $$(document, '.finds').forEach(function (finds) {
+      var tabsEl = finds.parentNode.querySelector('.tabs');
+      var cards = $$(finds, '.find');
+      if (!tabsEl) return;
+
+      var apply = function (kind) {
+        cards.forEach(function (c) { c.hidden = kind !== 'all' && c.getAttribute('data-kind') !== kind; });
+        $$(tabsEl, '.tab').forEach(function (t) {
+          var on = t.getAttribute('data-kind') === kind;
+          t.setAttribute('aria-selected', String(on));
+          t.tabIndex = on ? 0 : -1; // roving tabindex: one stop for the whole group
+        });
+      };
+
+      // Only kinds actually present get a tab, so no tab ever opens onto an empty page.
+      var present = KINDS.filter(function (k) {
+        return cards.some(function (c) { return c.getAttribute('data-kind') === k[0]; });
+      });
+      // With one kind there is nothing to filter between — the tab row would be decoration.
+      if (present.length < 2) { tabsEl.hidden = true; return; }
+
+      var mk = function (kind, label, n, selected) {
+        var t = document.createElement('button');
+        t.type = 'button';
+        t.className = 'tab';
+        t.setAttribute('role', 'tab');
+        t.setAttribute('data-kind', kind);
+        t.setAttribute('aria-selected', String(selected));
+        t.tabIndex = selected ? 0 : -1;
+        t.innerHTML = label + ' <span class="n">' + n + '</span>';
+        t.addEventListener('click', function () { apply(kind); });
+        return t;
+      };
+      // "All" leads and is selected: a page that opens filtered hides its own shape, and
+      // anything hidden is invisible to the browser's in-page find.
+      tabsEl.appendChild(mk('all', 'All', cards.length, true));
+      present.forEach(function (k) {
+        var n = cards.filter(function (c) { return c.getAttribute('data-kind') === k[0]; }).length;
+        tabsEl.appendChild(mk(k[0], k[1], n, false));
+      });
+      arrows(tabsEl, '.tab');
+      apply('all');
+    });
+
+    /* ---- Runs and scenarios: the hash is the selection ------------------------------------------
+       #run-2/scenario-id. Either half may be missing: no run opens the newest, no scenario opens
+       the run's first. A page with no .run wrappers (one pass) uses the hash for the scenario
+       alone. Every press writes the hash, so any view a reader is looking at is a link. */
+    var runs = $$(document, '.run');
+    var runTabs = $$(document, '.run-tab');
+
+    var show = function () {
+      var parts = decodeURIComponent(location.hash.replace(/^#/, '')).split('/');
+      var wantRun = runs.length ? parts[0] : null;
+      var wantSc = runs.length ? parts[1] : parts[0];
+
+      var run = runs.filter(function (r) { return r.getAttribute('data-run') === wantRun; })[0] || runs[runs.length - 1];
+      runs.forEach(function (r) { r.hidden = r !== run; });
+      runTabs.forEach(function (t) {
+        var on = !!run && t.getAttribute('data-go') === run.getAttribute('data-run');
+        t.classList.toggle('is-on', on);
+        t.setAttribute('aria-pressed', String(on));
+      });
+
+      var scope = run || document;
+      var scenes = $$(scope, '.scenario');
+      var nav = scope.querySelector('.scenarios');
+      if (!scenes.length) return;
+      var scene = scenes.filter(function (s) { return s.getAttribute('data-scenario') === wantSc; })[0] || scenes[0];
+      scenes.forEach(function (s) { s.hidden = s !== scene; });
+      if (nav) {
+        nav.hidden = scenes.length < 2; // a control with one option is furniture
+        $$(nav, '.sc-tab').forEach(function (t) {
+          var on = t.getAttribute('data-scenario') === scene.getAttribute('data-scenario');
+          t.setAttribute('aria-selected', String(on));
+          t.tabIndex = on ? 0 : -1;
+        });
+      }
+    };
+
+    var go = function (run, scenario) {
+      var h = [run, scenario].filter(Boolean).join('/');
+      if ('#' + h === location.hash) show(); else location.hash = h;
+    };
+
+    runTabs.forEach(function (t) {
+      t.addEventListener('click', function () { go(t.getAttribute('data-go')); });
+    });
+    $$(document, '.scenarios').forEach(function (nav) {
+      var run = nav.closest('.run');
+      $$(nav, '.sc-tab').forEach(function (t) {
+        t.addEventListener('click', function () { go(run && run.getAttribute('data-run'), t.getAttribute('data-scenario')); });
+      });
+      arrows(nav, '.sc-tab');
+    });
+
+    window.addEventListener('hashchange', show);
+    show();
+  })();
+</script>

@@ -1,0 +1,2230 @@
+/* Review-canvas design system binding. Self-contained: no Tailwind, no icon
+   font, no host dependency. The system is ported from B43's curriculum canvas
+   (cool-neutral paper + ink, 1.5px hairlines, 20px radius scale, pills,
+   weight-driven type, ease-out motion) with a neutral, themable identity.
+   Theme a project by overriding the tokens on .rv-root — nothing else.
+   The full rationale lives in the skill's references/design-system.md. */
+
+.rv-root {
+  /* Neutrals: cool paper and ink (OKLCH, tinted — never raw #000/#fff). */
+  /* bg sits a clear step below card (the reviewer, 2026-07-30: the canvas was too
+     close to the white pages); muted steps down with it so the gray bands
+     still read against the canvas. */
+  --rv-bg: oklch(0.956 0.0045 247.9);          /* page background / canvas */
+  --rv-card: oklch(0.9965 0.0017 247.84);      /* cards, popovers, raised surfaces */
+  --rv-muted: oklch(0.924 0.0058 247.9);       /* panels, hover fills, segmented track */
+  --rv-border: oklch(0.9147 0.0063 255.48);    /* 1.5px hairlines */
+  --rv-fg: oklch(0.2547 0.0087 255.59);        /* primary text / ink */
+  --rv-muted-fg: oklch(0.5611 0.0072 255.5);   /* secondary text (12px+ labels) */
+  /* Secondary text that carries INFORMATION rather than chrome (2026-08-13,
+     with the projects folder). --rv-muted-fg is ~3.2:1 on the light canvas —
+     fine for a micro-label beside the thing it labels, under the 4.5:1 floor
+     for a sentence someone has to read. This one measures 4.8:1 light and
+     6.0:1 dark, so prose, card meta and hints use it. */
+  --rv-muted-strong: oklch(0.45 0.0075 255.5);
+
+  /* Accent: comment pins + comment mode. Persimmon-family default; override
+     per project. Status colors: sign-off / needs work / broken. */
+  --rv-accent: #e8492b;
+  --rv-good: #5da94f;
+  --rv-needs: #f4b53c;
+  --rv-broken: #9a2f4a;
+  /* Agents (skills) comment alongside people — this is their identity colour, deliberately
+     off the accent/status ramp so a skill never reads as a pin or a triage state. */
+  --rv-agent: #6d4aff;
+
+  /* Event kind-groups (the reviewer, 2026-08-03): outbound comms / integration hooks /
+     notes. Deliberately their own ramp — an event is documentation, so it must
+     never borrow a triage or pin color's meaning. */
+  --rv-ev-comms: #eab308;
+  --rv-ev-hook: #e8762b;
+  --rv-ev-note: #3b82d6;
+
+  /* Presence (presence-ui.tsx): one colour per person for their avatar ring,
+     cursor and follow frame. Cool tones only (blue through pink, no browns,
+     oranges or olives, which read muddy), off the accent (pins) and agent
+     hues, and dark enough for white label text at 12px. */
+  --rv-p0: #2563eb;
+  --rv-p1: #1e40af;
+  --rv-p2: #0284c7;
+  --rv-p3: #0891b2;
+  --rv-p4: #0d9488;
+  --rv-p5: #115e59;
+  --rv-p6: #059669;
+  --rv-p7: #16a34a;
+  --rv-p8: #4f46e5;
+  --rv-p9: #3730a3;
+  --rv-p10: #7c3aed;
+  --rv-p11: #c026d3;
+  --rv-p12: #db2777;
+  --rv-p13: #e11d48;
+  --rv-p14: #475569;
+
+  /* Elevation scale (Tailwind-equivalent sm / lg / xl). Shadows are reserved
+     for floating layers: toolbar, menus, popovers, pins. Cards stay flat. */
+  --rv-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --rv-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --rv-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Motion: ease-out only. Fast for state, slower for entrances. */
+  --rv-ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint-ish */
+  --rv-fast: 130ms;
+
+  /* Native controls (checkbox, select, scrollbars) follow the board's theme
+     rather than the OS's — without this a dark board paints a light checkbox
+     and a light select menu (2026-08-13). */
+  color-scheme: light;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--rv-bg);
+  color: var(--rv-fg);
+  font: 14px/1.45 "Hanken Grotesk", "Hanken Grotesk Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+/* Dark theme: the same cool-ink family, inverted. JS resolves the tri-state
+   preference (auto follows prefers-color-scheme via matchMedia) down to this
+   one class, so the palette lives in exactly two blocks. Accent + status
+   colors carry over — they're saturated enough on ink. */
+.rv-root.is-dark {
+  color-scheme: dark;
+  --rv-bg: oklch(0.2158 0.0059 255.5);
+  --rv-card: oklch(0.2621 0.0064 255.5);
+  --rv-muted: oklch(0.3079 0.0068 255.5);
+  --rv-border: oklch(0.3608 0.0072 255.5);
+  --rv-fg: oklch(0.9435 0.0043 247.9);
+  --rv-muted-fg: oklch(0.6968 0.0072 255.5);
+  --rv-muted-strong: oklch(0.7565 0.0072 255.5);
+  --rv-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --rv-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --rv-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.45), 0 8px 10px -6px rgb(0 0 0 / 0.45);
+}
+
+.rv-root *, .rv-root *::before, .rv-root *::after { box-sizing: border-box; }
+/* Zero-specificity reset (:where) so single-class component styles always win. */
+:where(.rv-root button) { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
+.rv-root button:focus-visible,
+.rv-root [tabindex]:focus-visible { outline: 2px solid var(--rv-fg); outline-offset: 2px; }
+.rv-root h1, .rv-root h2, .rv-root h3, .rv-root p { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-root *, .rv-root *::before, .rv-root *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* --- header ------------------------------------------------------------- */
+
+.rv-header {
+  /* Above every workspace layer (sticky slides section-heads at 10, the
+     toolbar dock at 20): the page-picker dropdown lives in this context and
+     must never be cut by content scrolling under the header. */
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  flex-shrink: 0;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--rv-border);
+  background: color-mix(in srgb, var(--rv-card) 80%, transparent);
+  backdrop-filter: blur(8px);
+}
+/* One control height across every header (board, projects, access, flows):
+   a labelled pill is as tall as the icon buttons beside it. */
+.rv-header .rv-pill {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--rv-fg);
+}
+.rv-header-main { margin-right: auto; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.rv-header-logo { width: 22px; height: 22px; flex-shrink: 0; }
+/* The logo SVG is a single near-black fill — flatten to white on ink. */
+.rv-root.is-dark .rv-header-logo { filter: brightness(0) invert(1); }
+/* The logo links out to __DS_ADMIN_DOMAIN__ — hit area beyond the 22px mark, hover
+   ring in the same grammar as .rv-btn-icon. */
+.rv-logo-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -5px;
+  border-radius: 999px;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-logo-btn:hover { background: var(--rv-muted); }
+.rv-header-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.rv-header-sub { font-size: 12px; color: var(--rv-muted-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rv-autosave { flex-shrink: 0; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--rv-muted-fg); }
+.rv-autosave.is-error { color: var(--rv-broken); }
+
+/* Download progress: the button becomes the status, so an export doesn't need
+   a modal over a board the reviewer can keep using. */
+.rv-export.is-busy {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--rv-border);
+  border-radius: 999px;
+  padding: 5px 6px 5px 10px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--rv-muted-fg);
+  white-space: nowrap;
+}
+.rv-export-spin {
+  width: 12px;
+  height: 12px;
+  border: 2px solid color-mix(in srgb, var(--rv-muted-fg) 30%, transparent);
+  border-top-color: var(--rv-accent);
+  border-radius: 999px;
+  animation: rv-spin 700ms linear infinite;
+}
+.rv-export.is-busy button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-export.is-busy button:hover { background: var(--rv-muted); color: var(--rv-fg); }
+@keyframes rv-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .rv-export-spin { animation-duration: 2s; }
+}
+
+/* --- status colors -------------------------------------------------------- */
+
+.rv-s-good { --rv-s: var(--rv-good); }
+.rv-s-needs { --rv-s: var(--rv-needs); }
+.rv-s-none { --rv-s: color-mix(in srgb, var(--rv-muted-fg) 40%, transparent); }
+
+.rv-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rv-s, var(--rv-muted-fg));
+  flex-shrink: 0;
+}
+.rv-dot.is-small { width: 6px; height: 6px; }
+
+/* --- pills & buttons -------------------------------------------------------- */
+
+.rv-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease),
+    border-color var(--rv-fast) var(--rv-ease), opacity var(--rv-fast) var(--rv-ease);
+  white-space: nowrap;
+}
+.rv-pill:hover { background: var(--rv-muted); }
+.rv-pill.is-on {
+  border-color: var(--rv-s);
+  color: color-mix(in srgb, var(--rv-s) 85%, var(--rv-fg));
+  background: color-mix(in srgb, var(--rv-s) 10%, transparent);
+}
+.rv-pill .rv-count { font-variant-numeric: tabular-nums; opacity: 0.7; }
+
+/* Action pills (set a status): free-standing bordered buttons whose dot always
+   previews the color they would apply; hover pulls the border toward it. This
+   is the ACTION grammar — view/filter controls live on a recessed track and
+   must never share it. */
+.rv-pill.is-action { background: var(--rv-card); }
+.rv-pill.is-action:hover {
+  border-color: color-mix(in srgb, var(--rv-s) 55%, var(--rv-border));
+  background: color-mix(in srgb, var(--rv-s) 6%, var(--rv-card));
+  color: var(--rv-fg);
+}
+
+/* The status filter is ONE .rv-btn-toggle button opening a menu (2026-07-30;
+   the chip track is gone). is-open doubles as the filtered-state treatment. */
+.rv-btn-toggle.is-open { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-filter-chip .rv-count { font-variant-numeric: tabular-nums; opacity: 0.6; }
+
+/* Text toggle (e.g. "Show resolved"): inline-flex, NOT .rv-btn-icon — that
+   class is a grid, which stacks a label + count into two rows. */
+.rv-btn-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--rv-muted-fg);
+  white-space: nowrap;
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-btn-toggle:hover { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-btn-toggle .rv-count { font-variant-numeric: tabular-nums; opacity: 0.7; }
+
+.rv-btn-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-btn-icon:hover { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-btn-icon.is-danger:hover { background: color-mix(in srgb, var(--rv-broken) 10%, transparent); color: var(--rv-broken); }
+.rv-btn-icon:disabled { opacity: 0.35; cursor: default; }
+.rv-btn-icon:disabled:hover { background: transparent; color: var(--rv-muted-fg); }
+.rv-btn-icon.is-bordered { border: 1.5px solid var(--rv-border); }
+
+.rv-seg { display: flex; align-items: center; gap: 2px; border-radius: 999px; background: var(--rv-muted); padding: 2px; flex-shrink: 0; }
+.rv-seg-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease), box-shadow var(--rv-fast) var(--rv-ease);
+}
+.rv-seg-btn:hover { color: var(--rv-fg); }
+.rv-seg-btn.is-on { background: var(--rv-card); color: var(--rv-fg); box-shadow: var(--rv-shadow-sm); }
+
+/* --- menus ------------------------------------------------------------------ */
+
+.rv-menu {
+  position: absolute;
+  z-index: 30;
+  width: 240px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 16px;
+  background: var(--rv-card);
+  padding: 6px;
+  box-shadow: var(--rv-shadow-xl);
+}
+.rv-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-menu-item:hover { background: var(--rv-muted); }
+.rv-menu-item.is-danger { color: var(--rv-broken); }
+.rv-menu-item.is-danger:hover { background: color-mix(in srgb, var(--rv-broken) 10%, transparent); }
+.rv-menu-sep { height: 1px; background: var(--rv-border); margin: 6px 0; }
+.rv-menu-item .rv-grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* --- canvas board -------------------------------------------------------------- */
+
+/* Flex row: the shared sidebar (when open) then the canvas/slides surface. */
+.rv-workspace { position: relative; display: flex; min-height: 0; flex: 1; }
+/* clip, not hidden: hidden is still a programmatic scroll container, so
+   focusing the comment composer scroll-revealed it — shifting the rendered
+   world out from under the pan transform and stranding pins off-target.
+   clip cannot scroll, so focus can't move the world. */
+/* overscroll-behavior-x, not just the wheel handler's preventDefault: Chrome's
+   swipe back/forward gesture is a separate recognizer that the trackpad's
+   horizontal pan can still trigger even when the wheel event is canceled. */
+/* touch-action: none — on a touch screen the pinch belongs to the canvas, not
+   to the page around it. This is the gesture-level half of the same call the
+   viewport lock makes in app.tsx; without it the browser claims the pinch
+   before our handlers ever see it. */
+.rv-canvas { position: relative; height: 100%; flex: 1; min-width: 0; overflow: clip; overscroll-behavior-x: none; touch-action: none; }
+.rv-world { position: absolute; left: 0; top: 0; transform-origin: top left; }
+.rv-dots {
+  background-image: radial-gradient(circle, var(--rv-border) 1.4px, transparent 1.4px);
+  background-size: 34px 34px;
+}
+
+/* The page label band is gone (the reviewer, 2026-07-30) — the header's page picker
+   names where you are. Canvas bands are solid gray fills, not bordered white
+   cards (same day): borders on non-interactive labels read as visual noise
+   next to the screen frames. */
+
+/* Section band: the top level of the canvas, one above a flow header. */
+.rv-section-band {
+  pointer-events: none;
+  position: absolute;
+  border-left: 3px solid var(--rv-fg);
+  padding: 8px 0 8px 24px;
+}
+.rv-section-band-eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rv-muted-fg);
+}
+.rv-section-band h3 { margin-top: 4px; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; }
+.rv-section-band p { margin-top: 2px; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--rv-muted-fg); }
+
+.rv-flow { position: absolute; }
+.rv-selection-frame {
+  pointer-events: none;
+  position: absolute;
+  inset: -12px;
+  border-radius: 28px;
+  border: 2px solid color-mix(in srgb, var(--rv-fg) 35%, transparent);
+}
+.rv-selection-frame.is-dragging { border-color: color-mix(in srgb, var(--rv-fg) 60%, transparent); }
+
+.rv-flow-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  /* Border is reserved but invisible at rest — it only colors up for the
+     selection/drag states, so the resting card is a quiet gray fill. */
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  background: var(--rv-muted);
+  padding: 16px 20px;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color var(--rv-fast) var(--rv-ease), box-shadow var(--rv-fast) var(--rv-ease);
+}
+.rv-flow-header.is-selected { border-color: var(--rv-fg); }
+.rv-flow-header.is-dragging { border-color: var(--rv-fg); box-shadow: var(--rv-shadow-lg); }
+.rv-flow-header-main { min-width: 0; flex: 1; }
+.rv-flow-header-eyebrow { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--rv-muted-fg); }
+.rv-flow-header h3 { margin-top: 4px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-flow-header-sub { font-size: 12px; color: var(--rv-muted-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.rv-screen { position: absolute; top: 0; transition: opacity 150ms var(--rv-ease); }
+
+/* Selection ring on a clicked screen — mirrors the flow selection frame, hugs
+   the frame's 20px radius. Its accent signals "double-click to open in slides". */
+.rv-screen-sel {
+  pointer-events: none;
+  position: absolute;
+  inset: -8px;
+  border-radius: 28px;
+  border: 2px solid var(--rv-accent);
+}
+
+/* A screen node reads as a device screen, not a naked image: slim title
+   header, then the capture. Mirrors B43's frames. */
+.rv-screen-frame {
+  overflow: hidden;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 20px;
+  background: var(--rv-card);
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--rv-fast) var(--rv-ease);
+}
+.rv-screen-frame.is-status { border-color: var(--rv-s); }
+.rv-frame-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--rv-border);
+  /* Pinned to FRAME_CHROME_H (model.ts): the frame is its page plus exactly this. */
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 16px;
+}
+.rv-frame-head .rv-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.rv-frame-head .rv-n { flex-shrink: 0; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--rv-muted-fg); }
+/* Out to the real page, no board around it. Held back until the frame is under
+   the pointer (or the link is tabbed to): fifty of these lit at once on a
+   zoomed-out canvas is chrome, not an affordance. */
+.rv-frame-open {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  color: var(--rv-muted-fg);
+  opacity: 0;
+  transition: opacity var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease),
+    background var(--rv-fast) var(--rv-ease);
+}
+.rv-screen-frame:hover .rv-frame-open,
+.rv-frame-open:focus-visible { opacity: 1; }
+.rv-frame-open:hover { background: var(--rv-muted); color: var(--rv-fg); }
+/* The live badge also claims `margin-left: auto`; whichever comes first wins
+   the gap, so the pair stays right-aligned with the title truncating. */
+.rv-frame-open + .rv-live-badge { margin-left: 0; }
+.rv-frame-body { min-height: 0; flex: 1; background: var(--rv-muted); }
+.rv-frame-body img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.rv-frame-body .rv-screen-el { width: 100%; height: 100%; overflow: hidden; background: var(--rv-card); }
+/* Live pages own their scroll; never double-scroll the frame body around them. */
+.rv-frame-body:has(.rv-frame-live) { overflow: hidden; }
+
+/* --- live frames (url sources): materialize ------------------------------------- */
+/* The snapshot paints instantly; the real page loads behind it; a 200ms
+   crossfade swaps them — once. Zoom never changes what a frame shows. */
+/* `overflow: clip` is load-bearing, not tidiness. The iframe is laid out at the
+   page's real viewport width and scaled down with a transform — and a transform
+   doesn't shrink the layout box, so the iframe's box is 1/k times taller than
+   what it paints. Any scrolling ancestor counts that full box and offers a
+   scrollbar into empty space below the page. Clip it here (clip, not hidden: no
+   scroll container at all) so the only thing that can ever scroll is the page
+   inside the iframe, when its own content actually overflows. */
+.rv-frame-live { position: relative; overflow: clip; width: 100%; height: 100%; background: var(--rv-card); }
+.rv-frame-live iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--rv-card); }
+.rv-frame-live.is-inert iframe { pointer-events: none; }
+/* The session self-capture (snapshot-cache.ts): covers skeleton + booting
+   iframe, fades away the moment the live page is ready. */
+.rv-frame-live .rv-snap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: opacity var(--rv-fast) var(--rv-ease);
+}
+.rv-frame-live.is-live .rv-snap { opacity: 0; pointer-events: none; }
+/* The skeleton sits over the iframe until the real page has painted, then
+   fades out. Nothing else ever covers a live frame. */
+.rv-frame-placeholder.is-layer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 200ms var(--rv-ease);
+}
+.rv-frame-live.is-live .rv-frame-placeholder.is-layer { opacity: 0; pointer-events: none; }
+/* The pulse lives on the fill (.rv-lowfi-skeleton), not the whole placeholder:
+   the label over it stays steady and nothing pulses twice. */
+
+.rv-live-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  border: 1px solid var(--rv-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--rv-muted-fg);
+  animation: rv-badge-in 130ms var(--rv-ease);
+}
+.rv-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--rv-good);
+}
+/* "Go live" — the same badge slot, as a control: a zoomed-in frame paints its
+   cached capture and only boots the real page when asked. */
+.rv-live-badge.is-action {
+  background: transparent;
+  cursor: pointer;
+  transition: color 120ms var(--rv-ease), border-color 120ms var(--rv-ease);
+}
+.rv-live-badge.is-action:hover {
+  color: var(--rv-fg);
+  border-color: var(--rv-fg);
+}
+@keyframes rv-badge-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-frame-placeholder.is-layer { transition: none; }
+  .rv-frame-live.is-mounting .rv-frame-placeholder { animation: none; }
+  .rv-live-badge { animation: none; }
+}
+
+/* --- slides stepping: the stage frame morphs between screens ---------------------- */
+/* Named view transition on the frame box; app.tsx only starts one in slides
+   mode with motion allowed, so these rules never fire elsewhere. */
+.rv-slides-framebox { view-transition-name: rv-slide-frame; }
+::view-transition-old(rv-slide-frame),
+::view-transition-new(rv-slide-frame) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  height: 100%;
+  overflow: hidden;
+}
+.rv-frame-placeholder {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  background: var(--rv-card);
+}
+.rv-frame-placeholder p { font-size: 15px; font-weight: 600; text-wrap: balance; }
+.rv-frame-placeholder .rv-hint-line { margin-top: 6px; font-size: 12px; font-weight: 400; color: var(--rv-muted-fg); }
+/* The placeholder sits over the loading skeleton: its text gets a translucent
+   pill so it stays legible against the shimmer behind it. */
+.rv-frame-placeholder.has-skeleton { position: relative; }
+.rv-frame-placeholder.has-skeleton > div:not(.rv-lowfi-skeleton) {
+  position: relative;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--rv-card) 84%, transparent);
+  padding: 12px 18px;
+  backdrop-filter: blur(6px);
+}
+/* No snapshot yet: the same quiet gray pulse the projects page uses for a
+   thumbnail on its way in (the reviewer, 2026-09-18; replaced a drawn wireframe that
+   read as a broken page). One loading look across the board. */
+.rv-lowfi-skeleton {
+  position: absolute;
+  inset: 0;
+  background: var(--rv-muted);
+  animation: rv-thumb-pulse 1.6s var(--rv-ease) infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-lowfi-skeleton, .rv-thumb-skeleton { animation: none; }
+}
+
+/* Free-standing action buttons — the capsule wrapper died with the grammar
+   split (a bordered capsule of ghost pills was exactly what made triage look
+   like the header's filter pills). */
+.rv-review-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rv-flow-arrow {
+  pointer-events: none;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: color-mix(in srgb, var(--rv-muted-fg) 70%, transparent);
+}
+.rv-flow-arrow .rv-line { height: 1px; flex: 1; background: var(--rv-border); }
+
+/* --- floating toolbar ------------------------------------------------------------ */
+
+.rv-toolbar-dock {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+}
+/* The board sidebar sits on the left in both modalities; offset the dock by it
+   so the toolbar centers over the working surface, aligned with the hint.
+   ponytail: coupled to .rv-sidebar width (300px) — bump both together. */
+.rv-toolbar-dock.is-shifted { padding-left: 316px; }
+/* Dev mode docks a panel on the RIGHT; the toolbar recenters over what's left,
+   the same way it does for the sidebar. Width comes from the panel itself
+   (it's resizable), so this reads the variable rather than a constant. */
+.rv-toolbar-dock.is-dev-shifted { padding-right: var(--rvdev-inset, 400px); }
+.rv-toolbar {
+  pointer-events: auto;
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rv-card) 95%, transparent);
+  padding: 6px 8px;
+  box-shadow: var(--rv-shadow-lg);
+  backdrop-filter: blur(8px);
+}
+.rv-toolbar-sep { margin: 0 4px; height: 20px; width: 1px; flex-shrink: 0; background: var(--rv-border); }
+.rv-toolbar .rv-zoom-label { width: 40px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--rv-muted-fg); }
+
+/* Toolbar tools: cursor (the quiet default) and comment (the armed mode —
+   accent, because it changes what a click does). */
+.rv-tool-btn {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-tool-btn:hover { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-tool-btn.is-on { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-tool-btn.is-hot { background: var(--rv-accent); color: var(--rv-card); }
+
+/* Zoom dropdown trigger: the readout is the control. */
+.rv-zoom-trigger {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-zoom-trigger:hover,
+.rv-zoom-trigger.is-open { background: var(--rv-muted); color: var(--rv-fg); }
+
+.rv-page-trigger {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  /* 32px: every control in the header shares one height. */
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rv-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease),
+    border-color var(--rv-fast) var(--rv-ease);
+}
+.rv-page-trigger:hover { background: var(--rv-muted); }
+.rv-page-trigger.is-open { background: var(--rv-fg); color: var(--rv-bg); }
+.rv-page-trigger .rv-title { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Laid out by the toolbar dock (a centered column), not positioned against the
+   canvas — so it is anchored to the toolbar by construction and cannot drift.
+   A transient toast, not chrome: it fades in, auto-dismisses after a few
+   seconds, and any click on it dismisses it immediately (app.tsx <Hint>). */
+.rv-hint {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  border: 1px solid var(--rv-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rv-card) 92%, transparent);
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--rv-muted-fg);
+  box-shadow: var(--rv-shadow-sm);
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  animation: rv-hint-in 200ms var(--rv-ease);
+  transition: opacity 220ms var(--rv-ease), transform 220ms var(--rv-ease);
+}
+.rv-hint.is-leaving { opacity: 0; transform: translateY(6px); pointer-events: none; }
+@keyframes rv-hint-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+.rv-hint.is-comment { border-color: color-mix(in srgb, var(--rv-accent) 40%, transparent); color: var(--rv-fg); font-weight: 500; }
+
+/* --- comments -------------------------------------------------------------------- */
+
+.rv-overlay { pointer-events: none; position: absolute; inset: 0; overflow: hidden; }
+.rv-overlay .rv-marker { position: absolute; transform: translateY(-100%); }
+.rv-marker.is-resolved { opacity: 0.45; }
+
+.rv-pin {
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  border-bottom-left-radius: 3px;
+  background: var(--rv-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  box-shadow: var(--rv-shadow-lg), 0 0 0 2px var(--rv-card);
+  transition: transform 200ms var(--rv-ease), opacity 200ms var(--rv-ease), box-shadow var(--rv-fast) var(--rv-ease);
+}
+.rv-pin:hover { transform: scale(1.1); }
+.rv-pin { cursor: grab; }
+.rv-pin.is-dragging { cursor: grabbing; }
+.rv-pin.is-selected,
+.rv-pin:focus-visible { box-shadow: var(--rv-shadow-lg), 0 0 0 3px var(--rv-accent); outline: none; }
+/* Threads opened by a skill, findable on the canvas without opening each one. */
+.rv-pin.is-agent { background: var(--rv-agent); }
+.rv-pin.is-agent.is-selected,
+.rv-pin.is-agent:focus-visible { box-shadow: var(--rv-shadow-lg), 0 0 0 3px var(--rv-agent); }
+
+/* Read by ME (review_thread_reads). Same pin, less weight: it goes hollow —
+   card fill, a hairline of its own colour, quiet ink — so a lane of pins says
+   "these two are new" at a glance without a second colour or a badge. The
+   accent still names it a comment; only the emphasis moves. */
+.rv-pin.is-read {
+  background: var(--rv-card);
+  color: var(--rv-muted-fg);
+  box-shadow:
+    var(--rv-shadow-sm),
+    0 0 0 2px var(--rv-card),
+    inset 0 0 0 1.5px color-mix(in srgb, var(--rv-accent) 55%, transparent);
+}
+.rv-pin.is-agent.is-read {
+  box-shadow:
+    var(--rv-shadow-sm),
+    0 0 0 2px var(--rv-card),
+    inset 0 0 0 1.5px color-mix(in srgb, var(--rv-agent) 55%, transparent);
+}
+/* The open thread reads as open whatever its read state. */
+.rv-pin.is-read.is-selected,
+.rv-pin.is-read:focus-visible { box-shadow: var(--rv-shadow-lg), 0 0 0 3px var(--rv-accent); }
+.rv-pin.is-agent.is-read.is-selected,
+.rv-pin.is-agent.is-read:focus-visible { box-shadow: var(--rv-shadow-lg), 0 0 0 3px var(--rv-agent); }
+
+.rv-popover {
+  pointer-events: auto;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 16px;
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-xl);
+  transition: opacity 180ms var(--rv-ease), transform 180ms var(--rv-ease);
+}
+.rv-popover.is-composer { padding: 8px; }
+.rv-popover-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--rv-border);
+  padding: 8px 12px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.rv-popover-head:active { cursor: grabbing; }
+.rv-popover-head .rv-title { font-size: 13px; font-weight: 600; }
+.rv-popover-head .rv-actions { display: flex; align-items: center; gap: 2px; }
+.rv-popover-head .rv-btn-icon { width: 28px; height: 28px; }
+.rv-popover-head .rv-btn-icon.is-resolved { color: var(--rv-good); }
+
+.rv-popover-body { min-height: 0; flex: 1; overflow-y: auto; padding: 12px; }
+.rv-popover-foot { flex-shrink: 0; border-top: 1px solid var(--rv-border); padding: 8px; }
+.rv-composer-row { display: flex; flex-shrink: 0; align-items: flex-end; gap: 4px; }
+.rv-reply-row { display: flex; align-items: center; gap: 4px; }
+
+/* --- mentions ------------------------------------------------------------------- */
+/* A tagged name inside a body. Ink stays full-contrast and the accent does the
+   marking as a tint behind it — accent-coloured text at body size would fail
+   4.5:1, and a mention is something you read, not a label. */
+.rv-mention {
+  border-radius: 4px;
+  padding: 0 3px;
+  background: color-mix(in srgb, var(--rv-accent) 14%, transparent);
+  font-weight: 600;
+}
+/* Me. Louder, because "who is this for" is the one thing you scan a thread for. */
+.rv-mention.is-me { background: color-mix(in srgb, var(--rv-accent) 30%, transparent); }
+
+/* The picker. Sits in the popover's own flow above the input rather than
+   floating: .rv-popover is overflow:hidden, so an absolute menu would be
+   clipped at the top edge, and an in-flow one can't drift when the popover is
+   dragged mid-sentence. */
+.rv-mention-menu {
+  display: grid;
+  max-height: 168px;
+  overflow-y: auto;
+  margin-bottom: 6px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 12px;
+  background: var(--rv-card);
+  padding: 4px;
+  gap: 1px;
+}
+.rv-mention-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9px;
+  padding: 5px 6px;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-mention-item.is-active { background: var(--rv-muted); }
+.rv-mention-name { flex-shrink: 0; font-size: 13px; font-weight: 600; }
+.rv-mention-email {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--rv-muted-fg);
+}
+
+.rv-msg { display: flex; gap: 10px; }
+.rv-msg + .rv-msg { margin-top: 12px; }
+.rv-msg-main { min-width: 0; flex: 1; }
+.rv-msg-head { display: flex; align-items: baseline; gap: 8px; }
+.rv-msg-author { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-time { flex-shrink: 0; font-size: 12px; color: var(--rv-muted-fg); }
+.rv-msg-body { margin-top: 2px; font-size: 14px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.rv-reply-delete { margin-left: auto; font-size: 12px; color: var(--rv-muted-fg); opacity: 0; transition: opacity var(--rv-fast) var(--rv-ease); }
+.rv-msg:hover .rv-reply-delete,
+.rv-reply-delete:focus-visible { opacity: 1; }
+.rv-reply-delete:hover { color: var(--rv-broken); }
+
+.rv-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--rv-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* An agent (a skill) is a participant, not a system notice — same avatar, same slot in the
+   thread, different hue + a squircle so you can tell a person from a skill at a glance. */
+.rv-avatar.is-agent {
+  border-radius: 30%;
+  background: var(--rv-agent);
+}
+
+.rv-msg-author.is-agent {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: -0.02em;
+}
+
+/* Provenance under an agent message: what ran, what it touched, how it was checked. */
+.rv-msg-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 3px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--rv-muted-fg);
+}
+
+.rv-meta-chip {
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--rv-agent) 12%, transparent);
+  padding: 1px 5px;
+  color: var(--rv-agent);
+  font-weight: 600;
+}
+
+.rv-meta-file {
+  border-radius: 4px;
+  background: var(--rv-muted);
+  padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+}
+
+.rv-meta-verified::before {
+  content: "✓ ";
+  font-weight: 700;
+}
+
+.rv-textarea {
+  max-height: 160px;
+  min-height: 38px;
+  flex: 1;
+  resize: none;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--rv-fg);
+  outline: none;
+}
+.rv-textarea::placeholder { color: var(--rv-muted-fg); }
+.rv-input {
+  margin-bottom: 6px;
+  width: 100%;
+  flex-shrink: 0;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 12px;
+  background: var(--rv-bg);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--rv-fg);
+  outline: none;
+  transition: border-color var(--rv-fast) var(--rv-ease);
+}
+.rv-input:focus-visible { border-color: var(--rv-fg); }
+
+/* One-time identity step: a titled ask that can't be mistaken for the comment
+   field. Replaces the composer/reply row until the reviewer commits a name. */
+.rv-name-step { display: grid; gap: 2px; padding: 2px 2px 4px; }
+.rv-name-step .rv-name-title { font-size: 13px; font-weight: 600; color: var(--rv-fg); }
+.rv-name-step .rv-name-hint { margin-bottom: 8px; font-size: 11.5px; line-height: 1.4; color: var(--rv-muted-fg); }
+.rv-name-step .rv-name-row { display: flex; align-items: center; gap: 6px; }
+.rv-name-step .rv-input { margin-bottom: 0; }
+
+.rv-send {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--rv-accent);
+  color: #fff;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-send:hover { background: color-mix(in srgb, var(--rv-accent) 90%, var(--rv-fg)); }
+.rv-send:disabled { background: var(--rv-muted); color: var(--rv-muted-fg); cursor: default; }
+.rv-send.is-small { width: 28px; height: 28px; }
+
+.rv-attach-btn {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-attach-btn:hover { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-attach-btn:disabled { opacity: 0.5; }
+.rv-attach-btn.is-small { width: 28px; height: 28px; }
+
+.rv-attach-preview { position: relative; margin-bottom: 6px; width: fit-content; max-width: 100%; }
+.rv-attach-preview img { max-height: 112px; max-width: 100%; border: 1.5px solid var(--rv-border); border-radius: 12px; object-fit: contain; display: block; }
+.rv-attach-remove {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--rv-fg);
+  color: var(--rv-card);
+  box-shadow: var(--rv-shadow-sm);
+  transition: transform var(--rv-fast) var(--rv-ease);
+}
+.rv-attach-remove:hover { transform: scale(1.1); }
+.rv-attached-img {
+  margin-top: 6px;
+  max-height: 240px;
+  width: 100%;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 12px;
+  background: var(--rv-muted);
+  object-fit: contain;
+  display: block;
+}
+.rv-error-text { margin: 0 0 6px; padding: 0 4px; font-size: 12px; color: var(--rv-broken); }
+
+/* --- board sidebar (Pages / Comments, both modalities) --------------------------- */
+
+.rv-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--rv-border);
+  background: color-mix(in srgb, var(--rv-card) 60%, transparent);
+}
+.rv-side-head {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--rv-border);
+  padding: 10px 12px;
+}
+.rv-side-body { position: relative; min-height: 0; flex: 1; overflow-y: auto; padding-bottom: 32px; }
+/* Collapsed-sidebar reopen button: floats at the top-left of the workspace,
+   where the sidebar's header sits when open — same spot, both states. */
+.rv-side-open {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rv-card) 95%, transparent);
+  color: var(--rv-muted-fg);
+  box-shadow: var(--rv-shadow-lg);
+  backdrop-filter: blur(8px);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-side-open:hover { background: var(--rv-muted); color: var(--rv-fg); }
+/* In slides, the floating reopen button sits over the stage head — clear the
+   breadcrumb out from under it. (The button renders before .rv-slides.) */
+.rv-side-open ~ .rv-slides .rv-slides-stage-head { padding-left: 56px; }
+.rv-side-empty { padding: 16px 10px; font-size: 12px; line-height: 1.5; color: var(--rv-muted-fg); }
+
+/* Text tabs on the segmented track — the icon seg grammar, sized by label. */
+.rv-seg.is-grow { flex: 1; }
+.rv-seg.is-grow .rv-seg-btn { flex: 1; }
+.rv-seg-btn.is-label {
+  display: inline-flex;
+  width: auto;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.rv-seg-btn .rv-count { font-size: 11px; font-variant-numeric: tabular-nums; opacity: 0.6; }
+.rv-menu-item .rv-count { margin-left: auto; font-variant-numeric: tabular-nums; opacity: 0.6; }
+
+/* Back from the comments list to the page navigation (exits comment mode). */
+.rv-side-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin: 2px 2px 4px;
+  border-radius: 999px;
+  padding: 4px 10px 4px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-side-back:hover { background: var(--rv-muted); color: var(--rv-fg); }
+
+/* Comment list rows: avatar, author + time, where the pin lives, a snippet. */
+.rv-cmt-list { display: flex; flex-direction: column; gap: 2px; padding: 8px; }
+.rv-cmt-row {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: left;
+  transition: background var(--rv-fast) var(--rv-ease), border-color var(--rv-fast) var(--rv-ease);
+}
+.rv-cmt-row:hover { background: color-mix(in srgb, var(--rv-muted) 70%, transparent); }
+.rv-cmt-row.is-selected { border-color: var(--rv-fg); background: var(--rv-bg); }
+.rv-cmt-row.is-resolved { opacity: 0.55; }
+/* Unread is the EMPHASIZED state, never a dimming of the read one: a read row
+   keeps full contrast and simply stops shouting. The gutter is always there,
+   so nothing shifts sideways when a row is read. */
+.rv-cmt-unread { flex-shrink: 0; width: 7px; align-self: center; }
+.rv-cmt-row.is-unread .rv-cmt-unread {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--rv-accent);
+}
+/* No background tint on the unread row: on a fresh board EVERY row is unread,
+   and a whole column of tinted rows is a colour field, not a signal. The dot
+   and the weight carry it — and the read state stays full-contrast rather than
+   becoming a dimmed version of the unread one. */
+.rv-cmt-row.is-unread .rv-msg-author { font-weight: 700; }
+.rv-cmt-row.is-unread .rv-cmt-body { font-weight: 500; }
+
+.rv-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.rv-cmt-main { display: grid; min-width: 0; flex: 1; gap: 2px; }
+.rv-cmt-head { display: flex; align-items: baseline; gap: 6px; }
+.rv-cmt-row .rv-msg-author { font-size: 12px; }
+.rv-cmt-context { font-size: 11px; color: var(--rv-muted-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-cmt-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.rv-cmt-replies { font-size: 11px; color: var(--rv-muted-fg); }
+.rv-cmt-showresolved {
+  margin: 6px 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-cmt-showresolved:hover { background: color-mix(in srgb, var(--rv-muted) 70%, transparent); color: var(--rv-fg); }
+.rv-cmt-showresolved .rv-count { font-variant-numeric: tabular-nums; opacity: 0.7; }
+
+/* The Pages tab: the screen feed, grouped by section band then flow head. */
+.rv-slides-section-head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--rv-border);
+  background: color-mix(in srgb, var(--rv-card) 95%, transparent);
+  padding: 10px 16px;
+  backdrop-filter: blur(6px);
+}
+.rv-slides-section-head .rv-title { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 600; }
+/* Section heading in the feed — groups the flow heads below it (Flow.section). */
+.rv-slides-sectionband {
+  padding: 18px 16px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rv-muted-fg);
+  border-bottom: 1px solid var(--rv-border);
+}
+.rv-slides-list { padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+.rv-slide-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 8px 10px;
+  text-align: left;
+  transition: background var(--rv-fast) var(--rv-ease), border-color var(--rv-fast) var(--rv-ease), opacity 150ms var(--rv-ease);
+}
+.rv-slide-row:hover { background: color-mix(in srgb, var(--rv-muted) 70%, transparent); }
+.rv-slide-row.is-selected { border-color: var(--rv-fg); background: var(--rv-bg); }
+.rv-slide-row.is-muted { opacity: 0.35; }
+.rv-slide-row .rv-n { width: 20px; flex-shrink: 0; text-align: right; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--rv-muted-fg); }
+.rv-slide-row .rv-main { min-width: 0; flex: 1; }
+.rv-slide-row .rv-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; }
+
+/* --- slides view ---------------------------------------------------------------- */
+
+.rv-slides { display: flex; height: 100%; min-height: 0; flex: 1; min-width: 0; }
+/* Dev mode docks a panel over the right of the board. The canvas is an
+   infinite surface you pan, so it can live under it — a slide is a fixed
+   composition being fitted to the space, so it has to KNOW the space got
+   smaller, or the screen it centers is centered under the panel. */
+.rv-root.is-dev .rv-slides { margin-right: var(--rvdev-inset, 400px); }
+.rv-slides-stagewrap { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+.rv-slides-stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  border-bottom: 1px solid var(--rv-border);
+  background: color-mix(in srgb, var(--rv-card) 60%, transparent);
+  padding: 12px 20px;
+}
+.rv-slides-stage-head .rv-main { margin-right: auto; min-width: 0; }
+.rv-slides-stage-head .rv-eyebrow { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--rv-muted-fg); }
+.rv-slides-stage-head h2 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-slides-stage-head .rv-pager { display: flex; align-items: center; gap: 4px; }
+.rv-slides-stage-head .rv-pager-label { min-width: 56px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--rv-muted-fg); }
+
+.rv-slides-stage-outer { position: relative; min-height: 0; flex: 1; }
+/* Auto margins (not place-items: center) center the screen: a zoomed-in screen
+   overflows the stage and stays fully reachable by scrolling. */
+.rv-slides-stage { display: grid; height: 100%; overflow: auto; padding: 16px 32px 80px; }
+.rv-slides-stage .rv-slides-framebox { margin: auto; flex-shrink: 0; }
+/* Slides simulates the real viewport: a screen taller than its frame scrolls
+   inside the frame rather than cropping at the bottom. Frame proportion is
+   unchanged; only the inner image scrolls, and only when it overflows. */
+.rv-slides-stage .rv-frame-body { overflow-y: auto; }
+.rv-slides-stage .rv-frame-body img { height: auto; }
+.rv-slides-empty { display: grid; flex: 1; place-items: center; font-size: 14px; color: var(--rv-muted-fg); }
+/* --- Flow view (2026-08-18) --------------------------------------------------
+   The page as a branching chart: preview nodes, arrows with the branch
+   condition on them. Shares the canvas's world/dots/screen classes; only the
+   graph-specific pieces live here. */
+
+.rv-fv-component { position: absolute; }
+.rv-fv-head { pointer-events: none; border-left: 3px solid var(--rv-fg); padding: 4px 0 4px 24px; }
+.rv-fv-eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rv-muted-fg);
+}
+.rv-fv-head h3 { margin-top: 4px; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; white-space: nowrap; }
+.rv-fv-sub { margin-top: 2px; max-width: 720px; font-size: 13px; color: var(--rv-muted-fg); }
+
+.rv-fv-edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; color: var(--rv-muted-strong); }
+.rv-fv-edge { fill: none; stroke: currentColor; stroke-width: 2; }
+/* The arrows an un-authored flow keeps from its lane order — quieter, so the
+   authored branches read as the statement and the chains as the default. */
+.rv-fv-edge.is-auto { color: var(--rv-border); stroke-width: 1.5; }
+
+/* The branch condition, riding its arrow's midpoint. */
+.rv-fv-label {
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  max-width: 240px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rv-border);
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-sm);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--rv-fg);
+}
+
+.rv-fv-node { cursor: default; }
+
+/* Open-comment count on a node. Unread is the EMPHASIZED state (the board's
+   own rule) — read badges stay quiet outlines. */
+.rv-fv-badge {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rv-border);
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--rv-muted-strong);
+  cursor: pointer;
+}
+.rv-fv-badge.is-unread { border-color: var(--rv-accent); background: var(--rv-accent); color: #fff; }
+
+/* What the chart is missing — reported, never blocking (the /flows rule). */
+.rv-fv-problems {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  max-width: 320px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--rv-border);
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-lg);
+  font-size: 12px;
+  color: var(--rv-muted-fg);
+  display: grid;
+  gap: 4px;
+}
+.rv-fv-problems-head { font-weight: 600; color: var(--rv-fg); }
+
+/* The canvas equivalent (2026-08-13): screen space, centred, non-interactive
+   so it never eats a pan that starts on it. */
+.rv-canvas-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-size: 14px;
+  color: var(--rv-muted-fg);
+}
+.rv-slide-capture { position: absolute; inset: 0; z-index: 10; }
+
+/* --- events (the documentation layer, 2026-08-03) ---------------------------
+   Reviewer-added system events (events-ui.tsx) rendered directly below each
+   canvas frame — an email/push/SMS/webhook/API/note card per event, always
+   visible, plus the + composer in a counter-scaled popover. Muted chrome on
+   purpose: events annotate the design under review, they never compete. */
+
+.rv-doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--rv-muted-fg);
+  background: var(--rv-card);
+  white-space: nowrap;
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease),
+    border-color var(--rv-fast) var(--rv-ease);
+}
+.rv-doc-chip:hover { background: var(--rv-muted); color: var(--rv-fg); }
+.rv-doc-chip.is-on { border-color: var(--rv-fg); color: var(--rv-fg); }
+/* Screens with no events yet carry a dashed "Add event" chip — quieter than a
+   card, but findable ("how do I see the +?" — the reviewer, 2026-08-03). */
+.rv-doc-chip.is-ghost { border-style: dashed; background: color-mix(in srgb, var(--rv-card) 55%, transparent); padding: 4px 11px; font-size: 11.5px; }
+.rv-doc-chip.is-ghost:hover { background: var(--rv-card); border-style: solid; }
+.rv-doc-chip.is-save { border-color: var(--rv-fg); background: var(--rv-fg); color: var(--rv-bg); }
+.rv-doc-chip.is-save:hover { background: var(--rv-fg); color: var(--rv-bg); opacity: 0.9; }
+.rv-doc-chip.is-save:disabled { opacity: 0.4; cursor: default; }
+
+.rv-doc-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 60;
+  width: 340px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 14px;
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-lg);
+  padding: 6px;
+}
+.rv-doc-pop-head {
+  padding: 8px 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rv-muted-fg);
+}
+.rv-doc-pop-head span { text-transform: none; letter-spacing: normal; font-weight: 600; color: var(--rv-fg); }
+
+/* The per-screen event list — world space, docked under the frame. */
+.rv-screen-docs { position: absolute; left: 0; right: 0; }
+.rv-events { position: relative; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.rv-event-card {
+  width: 100%;
+  border: 1.5px solid color-mix(in srgb, var(--rv-ev) 40%, var(--rv-border));
+  border-left: 4px solid var(--rv-ev);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--rv-ev) 5%, var(--rv-card));
+  padding: 8px 11px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+/* Kind-group color: comms (email/SMS/push) yellow · hooks (webhook/API)
+   orange · notes blue. One custom property drives border, ground, and label. */
+.rv-event-card.is-comms, .rv-doc-chip.is-comms { --rv-ev: var(--rv-ev-comms); }
+.rv-event-card.is-hook, .rv-doc-chip.is-hook { --rv-ev: var(--rv-ev-hook); }
+.rv-event-card.is-note, .rv-doc-chip.is-note { --rv-ev: var(--rv-ev-note); }
+.rv-event-card .rv-event-kind { color: color-mix(in srgb, var(--rv-ev) 72%, var(--rv-fg)); }
+/* Composer kind chips preview their group color; the picked one commits to it. */
+.rv-doc-chip.is-comms > svg, .rv-doc-chip.is-hook > svg, .rv-doc-chip.is-note > svg {
+  color: var(--rv-ev);
+}
+.rv-doc-chip.is-on.is-comms, .rv-doc-chip.is-on.is-hook, .rv-doc-chip.is-on.is-note {
+  border-color: var(--rv-ev);
+  color: color-mix(in srgb, var(--rv-ev) 70%, var(--rv-fg));
+  background: color-mix(in srgb, var(--rv-ev) 10%, var(--rv-card));
+}
+.rv-event-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.rv-event-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rv-muted-fg);
+}
+.rv-event-who { margin-left: auto; font-size: 11px; color: var(--rv-muted-fg); white-space: nowrap; }
+.rv-event-del {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 6px;
+  color: var(--rv-muted-fg);
+  opacity: 0;
+  transition: opacity var(--rv-fast) var(--rv-ease);
+}
+.rv-event-card:hover .rv-event-del { opacity: 1; }
+.rv-event-del:hover { color: var(--rv-broken); background: var(--rv-muted); }
+.rv-event-body { color: var(--rv-fg); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.rv-event-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--rv-muted-fg);
+}
+.rv-event-add:hover { background: var(--rv-muted); color: var(--rv-fg); }
+
+/* Single-page view: the event stack sits directly below the frame, matching
+   the canvas (width pinned to the rendered frame by an inline style). */
+.rv-slides-events { padding: 14px 0 8px; }
+
+/* The + composer (inside the counter-scaled popover). */
+.rv-event-compose { display: flex; flex-direction: column; gap: 7px; padding: 2px 4px 4px; }
+.rv-event-kinds { display: flex; flex-wrap: wrap; gap: 4px; }
+.rv-event-input {
+  width: 100%;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 10px;
+  background: var(--rv-bg);
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--rv-fg);
+  resize: vertical;
+}
+.rv-event-input:focus { outline: none; border-color: var(--rv-fg); }
+.rv-event-compose-foot { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+
+/* --- projects folder + manage access (2026-08-13) ------------------------ */
+/* One level above a board. A plain scrolling document, not a floating panel:
+   it is a list you read top to bottom, not a space you pan around.
+
+   A card's face is the project's OWN lead screen, painted from the board's
+   capture cache (project-thumb.tsx). So the thumbnail is not decoration and
+   never needs art: it is the board, small. */
+
+/* The toolbar stays put; only the content column scrolls.
+   ⚠ The reset is not decoration: the harness renders inside __DS_APP_DIR__, whose base
+   layer styles the <main> LANDMARK itself (`main { max-width: 45rem; margin: 0
+   auto; padding: 3rem 1.5rem }` in index.css). The board never used <main>, so
+   this page was the first to inherit it — and did, silently, at 720px. */
+.rv-folder-root .rv-page {
+  max-width: none;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 40px 32px 96px;
+}
+/* The page is a scrolling flex column, so its children would otherwise be
+   squeezed to fit rather than scrolled to. Every section holds its own height:
+   with folders there are several grids down the page, not one. */
+.rv-folder-root .rv-page > * { width: 100%; max-width: 920px; margin-inline: auto; flex-shrink: 0; }
+/* A dialog opened from this page covers the window, not the column. */
+.rv-folder-root .rv-page > .rv-share-backdrop { width: auto; max-width: none; margin: 0; }
+/* The toolbar keeps the board's own padding, so its controls sit where a
+   project page puts them. */
+@media (max-width: 640px) {
+  .rv-folder-root .rv-page { padding: 28px 20px 72px; gap: 24px; }
+}
+/* Manage access is rows and prose, not a grid — it reads better narrow. */
+.rv-folder-root .rv-page.is-narrow > * { max-width: 820px; }
+
+.rv-page-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+.rv-page-head p { margin-top: 5px; font-size: 13.5px; color: var(--rv-muted-strong); }
+
+/* Left-aligned inside a column whose children are centred by default — the
+   selector has to match the shell rule's specificity to win. */
+.rv-folder-root .rv-page > .rv-backlink {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  margin-left: -10px;
+  margin-right: auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--rv-muted-strong);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rv-folder-root .rv-page > .rv-backlink:hover { background: var(--rv-muted); color: var(--rv-fg); }
+
+/* --- the grid ------------------------------------------------------------ */
+
+.rv-folder-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* Narrower columns than the landscape cards had: a phone-shaped card at
+     300px wide would stand 650px tall and one project would fill the fold. */
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 28px 22px;
+}
+
+/* No card chrome around the card: the thumbnail IS the object, and the label
+   sits under it on the page ground (a bordered box around a bordered picture
+   is two frames for one thing). */
+.rv-pcard { display: block; width: 100%; text-align: left; }
+
+.rv-thumb {
+  position: relative;
+  /* The phone screen, cropped to 3:4: still the mobile capture at full width
+     (never the desktop adaptation), with the bottom cut off. The image is
+     top-aligned cover, so the first fold is what shows (the reviewer, 2026-09-18). */
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 16px;
+  background: var(--rv-card);
+  transition: border-color 200ms var(--rv-ease), box-shadow 200ms var(--rv-ease), transform 200ms var(--rv-ease);
+}
+.rv-pcard:hover .rv-thumb {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--rv-fg) 22%, var(--rv-border));
+  box-shadow: var(--rv-shadow-lg);
+}
+.rv-thumb-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Top-aligned: a screen's identity is in its first fold, never its footer. */
+  object-position: top center;
+  transition: transform 260ms var(--rv-ease);
+}
+.rv-pcard:hover .rv-thumb-img { transform: scale(1.015); }
+
+/* Skeleton, not a spinner — the card holds its shape while the picture
+   arrives, so the grid never reflows under the pointer. */
+.rv-thumb-skeleton {
+  position: absolute;
+  inset: 0;
+  background: var(--rv-muted);
+  animation: rv-thumb-pulse 1.6s var(--rv-ease) infinite alternate;
+}
+@keyframes rv-thumb-pulse { from { opacity: 0.55; } to { opacity: 1; } }
+
+/* A project with no screens shows the canvas itself, dots and all. */
+.rv-thumb-canvas { position: absolute; inset: 0; opacity: 0.9; }
+
+.rv-pcard-foot { display: flex; flex-direction: column; gap: 2px; padding: 12px 2px 0; }
+.rv-pcard-name { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; }
+.rv-pcard-meta { font-size: 12.5px; color: var(--rv-muted-strong); font-variant-numeric: tabular-nums; min-height: 1em; }
+
+/* Two up on a phone. One phone-shaped card per row is taller than the screen
+   it is a picture OF, and pushes the second project off the fold — the one
+   thing a folder exists to prevent. After the base rule, not before: same
+   specificity, so source order is what decides. */
+@media (max-width: 640px) {
+  .rv-folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+}
+
+.rv-folder-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 72px 24px;
+  border: 1.5px dashed var(--rv-border);
+  border-radius: 20px;
+  color: var(--rv-muted-strong);
+  text-align: center;
+}
+.rv-folder-empty-title { font-size: 15px; font-weight: 600; color: var(--rv-fg); }
+.rv-folder-empty-sub { font-size: 13px; max-width: 46ch; }
+
+/* --- manage access ------------------------------------------------------- */
+
+.rv-folder-section { display: flex; flex-direction: column; gap: 12px; }
+.rv-folder-sechead h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.rv-folder-sechead p { margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--rv-muted-strong); max-width: 68ch; }
+
+.rv-folder-error {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  color: var(--rv-broken);
+  background: color-mix(in srgb, var(--rv-broken) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--rv-broken) 30%, transparent);
+}
+
+.rv-folder-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 18px;
+  background: var(--rv-card);
+}
+.rv-folder-panel > .rv-folder-rows, .rv-folder-panel > .rv-folder-check { width: 100%; }
+.rv-folder-panel-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.rv-folder-panel-title { font-size: 14.5px; font-weight: 600; }
+.rv-folder-slug { font-size: 11.5px; color: var(--rv-muted-fg); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.rv-folder-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.rv-folder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 9px 0;
+  font-size: 13.5px;
+  border-top: 1.5px solid var(--rv-border);
+}
+.rv-folder-rows > li:first-child { border-top: none; padding-top: 2px; }
+/* The one toggle here is a permission, not a triage state — it takes the
+   "good" hue explicitly so .rv-pill.is-on has a colour to mix. */
+.rv-folder-row .rv-pill { --rv-s: var(--rv-good); }
+
+.rv-folder-tag {
+  flex-shrink: 0;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--rv-muted);
+  color: var(--rv-muted-strong);
+  font-size: 11px;
+  font-weight: 500;
+}
+.rv-folder-hint { font-size: 12.5px; color: var(--rv-muted-strong); }
+/* 45/55 toward ink, not the raw amber: --rv-needs is a DOT colour (it only
+   ever sits beside a shape), and at 70% it measures ~2.6:1 as text on the light
+   canvas. This lands ~5:1 and still reads amber; the mix follows --rv-fg, so
+   the dark theme gets the light-gold end of the same ramp for free. */
+.rv-folder-hint.is-warn { color: color-mix(in srgb, var(--rv-needs) 45%, var(--rv-fg)); }
+
+.rv-folder-check { display: flex; align-items: center; gap: 9px; font-size: 13.5px; cursor: pointer; }
+.rv-folder-check input { width: 15px; height: 15px; flex-shrink: 0; accent-color: var(--rv-fg); }
+
+/* Adding is collapsed until wanted: a permanent four-control form per project
+   is a lot of furniture for something touched once a month. */
+.rv-folder-addghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px dashed var(--rv-border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--rv-muted-strong);
+  transition: border-color var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease),
+    background var(--rv-fast) var(--rv-ease);
+}
+.rv-folder-addghost:hover {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--rv-fg) 25%, var(--rv-border));
+  background: var(--rv-card);
+  color: var(--rv-fg);
+}
+
+.rv-folder-add { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; }
+.rv-folder-input {
+  border: 1.5px solid var(--rv-border);
+  border-radius: 999px;
+  background: var(--rv-bg);
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--rv-fg);
+  min-width: 0;
+}
+.rv-folder-input::placeholder { color: var(--rv-muted-strong); }
+.rv-folder-input:focus { outline: none; border-color: var(--rv-fg); }
+.rv-folder-cancel { font-size: 12.5px; color: var(--rv-muted-strong); padding: 4px 6px; }
+.rv-folder-cancel:hover { color: var(--rv-fg); }
+.rv-folder-nameinput { flex: 1; min-width: 200px; }
+
+/* --- folders on the projects page (2026-09-18) ---------------------------
+   A heading per folder, the unfiled projects first with none at all. The page
+   is a scrolling flex column, so every section holds its own height rather
+   than being squeezed by the grid below it. */
+
+.rv-folder-group { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; margin-top: 28px; }
+.rv-folder-ghead { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.rv-folder-ghead > svg { color: var(--rv-muted-strong); flex-shrink: 0; }
+.rv-folder-gname { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.rv-folder-gcount { font-size: 12.5px; color: var(--rv-muted-strong); font-variant-numeric: tabular-nums; }
+.rv-folder-gshare {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--rv-muted-strong);
+}
+.rv-folder-gshare:hover { background: var(--rv-muted); color: var(--rv-fg); }
+
+/* Archive: shut until asked for. The caret turns, so the state is a shape as
+   well as a word. */
+.rv-folder-disclose {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  align-self: flex-start;
+  padding: 4px 6px 4px 2px;
+  border-radius: 10px;
+  color: var(--rv-fg);
+}
+.rv-folder-disclose:hover { background: var(--rv-muted); }
+.rv-folder-disclose > svg { transform: rotate(-90deg); transition: transform var(--rv-fast) var(--rv-ease); }
+.rv-folder-disclose.is-open > svg { transform: none; }
+
+/* The card and its menu are siblings, so the menu floats over the corner of
+   the thumbnail without ever sitting inside the card's button. */
+.rv-pcard-wrap { position: relative; }
+.rv-pcard-wrap.is-dim .rv-pcard { opacity: 0.7; }
+.rv-pcard-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rv-card) 82%, transparent);
+  backdrop-filter: blur(6px);
+}
+.rv-fmenu { position: relative; }
+
+/* Back to the projects folder, left of the board's name (the reviewer, 2026-08-13 —
+   it replaced a project dropdown; you pick a project in the folder, where you
+   can see what each one is). Sits inside the title cluster, so it takes the
+   negative margin that keeps the logo-to-name rhythm even. */
+.rv-header-back { margin-left: -4px; flex-shrink: 0; }
+
+
+/* --- Presence: avatars, cursors, follow (presence-ui.tsx) ------------------- */
+.rv-presence { position: relative; flex-shrink: 0; }
+/* The row is one button: it opens the flyout (presence-ui.tsx). */
+.rv-presence-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+/* The avatars overlap by 6px; the first has nothing to overlap, so the
+   padding reads the same on all four sides. */
+.rv-presence-trigger > :first-child { margin-left: 0; }
+.rv-presence-trigger:hover,
+.rv-presence-trigger[aria-expanded="true"] { background: var(--rv-muted); }
+.rv-presence-trigger:focus-visible { outline: 2px solid var(--rv-fg); outline-offset: 2px; }
+.rv-presence-avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: -6px;
+  border-radius: 999px;
+  border: 2px solid var(--rv-card);
+  background: var(--rv-pc);
+  color: var(--rv-pi, #fff);
+  font-size: 12px;
+  font-weight: 600;
+  transition: box-shadow var(--rv-fast) var(--rv-ease);
+}
+/* Following is carried by the ring, not colour alone. */
+.rv-presence-avatar.is-following { position: relative; box-shadow: 0 0 0 2px var(--rv-card), 0 0 0 4px var(--rv-pc); z-index: 2; }
+.rv-presence-avatar.is-emoji { font-size: 15px; line-height: 1; }
+/* Me, hidden from others: faded to grey. Quiet on purpose (a dashed ring
+   pulled the eye); the menu says it in words, "You, hidden from others". */
+.rv-presence-avatar.is-hidden {
+  background: color-mix(in srgb, var(--rv-pc) 35%, var(--rv-card));
+  color: var(--rv-card);
+  filter: grayscale(1);
+}
+/* Faded with a solid fill, not opacity, so a neighbour never shows through.
+   Stacking: the others, then me over them, then "+N" over me. */
+.rv-presence-avatar.is-self { position: relative; z-index: 3; }
+.rv-presence-trigger .rv-presence-more { position: relative; z-index: 4; }
+.rv-presence-caret { margin-left: 2px; color: var(--rv-muted-fg); flex-shrink: 0; }
+.rv-presence-avatar.is-large { width: 40px; height: 40px; margin: 0; border: 0; font-size: 16px; flex-shrink: 0; }
+.rv-presence-avatar.is-large.is-emoji { font-size: 22px; }
+.rv-presence-avatar.is-small { width: 24px; height: 24px; margin: 1px 0 0; border: 0; font-size: 11px; flex-shrink: 0; }
+.rv-presence-menu {
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: 304px;
+  padding: 0;
+  overflow: hidden;
+  transition: height 220ms var(--rv-ease);
+}
+/* Two pages side by side; Edit slides the track left. */
+.rv-presence-track { display: flex; width: 200%; align-items: flex-start; transition: transform 220ms var(--rv-ease); }
+.rv-presence-track.is-editing { transform: translateX(-50%); }
+.rv-presence-page { width: 50%; max-height: min(620px, 80vh); overflow-y: auto; padding: 6px; }
+.rv-presence-page-head { display: flex; align-items: center; gap: 4px; padding: 0 4px 2px 0; font-size: 14px; font-weight: 600; color: var(--rv-fg); }
+.rv-presence-back {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: var(--rv-fg);
+  cursor: pointer;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-presence-back:hover { background: var(--rv-muted); }
+.rv-presence-back:focus-visible { outline: 2px solid var(--rv-fg); outline-offset: 1px; }
+.rv-presence-row.is-me { align-items: center; }
+.rv-presence-row-edit { display: flex; flex-shrink: 0; align-items: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--rv-muted-fg); }
+.rv-presence-row.is-me:hover .rv-presence-row-edit { color: var(--rv-fg); }
+.rv-presence-swatch.is-custom { position: relative; background: conic-gradient(from 90deg, #e11d48, #c026d3, #4f46e5, #0284c7, #0d9488, #16a34a, #ca8a04, #ea580c, #e11d48); }
+.rv-presence-swatch.is-custom.is-on { background: var(--rv-pc); box-shadow: 0 0 0 2px var(--rv-card), 0 0 0 4px var(--rv-pc); }
+.rv-presence-swatch.is-custom:focus-within { outline: 2px solid var(--rv-fg); outline-offset: 2px; }
+/* The native input covers the cell, invisible, so the cell opens the picker. */
+.rv-presence-custom-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+/* On/off: a switch whose knob moves, not colour alone. */
+.rv-presence-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 30px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--rv-border);
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-presence-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--rv-card);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  transition: transform var(--rv-fast) var(--rv-ease);
+}
+.rv-presence-toggle[aria-checked="true"] .rv-presence-switch { background: var(--rv-fg); }
+.rv-presence-toggle[aria-checked="true"] .rv-presence-switch::after { transform: translateX(12px); }
+.rv-presence-self { display: flex; align-items: center; gap: 12px; padding: 8px 10px 4px; }
+.rv-presence-name { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 3px; }
+.rv-presence-name input,
+.rv-presence-paste {
+  width: 100%;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 10px;
+  background: var(--rv-card);
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rv-fg);
+}
+.rv-presence-name input:focus-visible,
+.rv-presence-paste:focus-visible { outline: none; border-color: var(--rv-fg); }
+.rv-presence-label { font-size: 11px; font-weight: 600; color: var(--rv-muted-fg); }
+.rv-presence-label.is-section { padding: 10px 10px 6px; }
+.rv-presence-hint { padding: 2px 10px 0; font-size: 11.5px; color: var(--rv-muted-fg); }
+.rv-presence-swatches,
+.rv-presence-emojis { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; padding: 0 10px; }
+.rv-presence-swatch {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: var(--rv-pc);
+  color: var(--rv-pi, #fff);
+  cursor: pointer;
+}
+/* Chosen: a ring and a check, not colour alone. */
+.rv-presence-swatch[aria-checked="true"] { box-shadow: 0 0 0 2px var(--rv-card), 0 0 0 4px var(--rv-pc); }
+.rv-presence-swatch:focus-visible,
+.rv-presence-emoji:focus-visible { outline: 2px solid var(--rv-fg); outline-offset: 2px; }
+.rv-presence-emoji {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rv-presence-emoji:hover { background: var(--rv-muted); }
+.rv-presence-emoji.is-initial { font-size: 13px; font-weight: 600; color: var(--rv-fg); }
+.rv-presence-emoji[aria-checked="true"] { background: var(--rv-muted); box-shadow: inset 0 0 0 1.5px var(--rv-fg); }
+.rv-presence-paste { display: block; width: calc(100% - 20px); margin: 8px 10px 4px; font-weight: 400; }
+.rv-presence-toggle { margin-top: 4px; }
+.rv-presence-menu-head { padding: 6px 12px 4px; font-size: 11px; font-weight: 600; color: var(--rv-muted-fg); }
+.rv-presence-row { align-items: flex-start; }
+.rv-presence-row[aria-disabled="true"] { cursor: default; }
+.rv-presence-row[aria-disabled="true"]:hover { background: transparent; }
+.rv-presence-row-text { display: flex; flex-direction: column; gap: 1px; }
+.rv-presence-row-name { display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-presence-row-where { font-size: 12px; font-weight: 400; color: var(--rv-muted-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-presence-tag { flex-shrink: 0; border-radius: 999px; background: var(--rv-muted); padding: 1px 6px; font-size: 10.5px; font-weight: 600; color: var(--rv-muted-strong); }
+/* Following: a word, not colour alone. */
+.rv-presence-row-state { flex-shrink: 0; align-self: center; font-size: 11.5px; font-weight: 600; color: var(--rv-fg); }
+.rv-presence-menu-note { padding: 4px 12px 2px; font-size: 12px; color: var(--rv-muted-fg); }
+.rv-presence-keys { margin: 2px 0 0; padding: 6px 12px 4px; font-size: 12px; color: var(--rv-muted-fg); }
+.rv-presence-keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--rv-muted);
+  color: var(--rv-fg);
+  font: 600 11px/1 inherit;
+}
+.rv-presence-more {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  margin-left: -6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 2px solid var(--rv-card);
+  background: var(--rv-muted);
+  color: var(--rv-muted-strong);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rv-cursors { position: absolute; inset: 0; z-index: 15; overflow: hidden; pointer-events: none; }
+.rv-cursor { position: absolute; left: 0; top: 0; transition: opacity 400ms var(--rv-ease); will-change: transform; }
+.rv-cursor svg { display: block; fill: var(--rv-pc); stroke: #fff; stroke-width: 1.5; stroke-linejoin: round; filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.25)); }
+.rv-cursor-label {
+  position: absolute;
+  left: 14px;
+  top: 17px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--rv-pc);
+  color: var(--rv-pi, #fff);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  box-shadow: var(--rv-shadow-sm);
+}
+
+.rv-follow {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 3px var(--rv-pc);
+}
+/* In the toolbar dock, above the toolbar: centred over the board, clear of
+   the slides title and section heads at the top. */
+.rv-follow-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 6px 5px 12px;
+  border-radius: 999px;
+  background: var(--rv-pc);
+  color: var(--rv-pi, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--rv-shadow-lg);
+  pointer-events: auto;
+}
+.rv-follow-pill button {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.2);
+  color: var(--rv-pi, #fff);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.rv-follow-pill button:hover { background: rgb(255 255 255 / 0.32); }
+/* Cursor chat (presence-chat.tsx). On someone else's cursor the name label
+   becomes the bubble; on mine it's a field riding my pointer. The corner at
+   the pointer is tight, the rest round, so it reads as coming from the tip. */
+.rv-cursor.is-chatting svg { visibility: hidden; }
+.rv-cursor-label.is-chat {
+  left: 0;
+  top: 0;
+  /* The cursor is zero-wide: size to the text, then wrap at the cap. */
+  width: max-content;
+  max-width: 300px;
+  padding: 8px 14px;
+  border-radius: 3px 18px 18px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 21px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  box-shadow: var(--rv-shadow-lg);
+}
+.rv-cursor-label.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: 1.5px;
+  height: 14px;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: currentColor;
+  animation: rv-caret 1s steps(1) infinite;
+}
+@keyframes rv-caret { 50% { opacity: 0; } }
+
+.rv-chat {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: 300px;
+  padding: 8px 14px;
+  border-radius: 3px 18px 18px 18px;
+  background: var(--rv-pc);
+  color: var(--rv-pi, #fff);
+  box-shadow: var(--rv-shadow-lg);
+  font-size: 15px;
+  line-height: 21px;
+  will-change: transform;
+  animation: rv-chat-in 160ms var(--rv-ease);
+}
+/* A fade only: a grow from the corner reads as the bubble sliding away. */
+@keyframes rv-chat-in { from { opacity: 0; } }
+.rv-chat { transform-origin: 0 0; }
+/* It replaces the pointer, open or closed: the tight corner is the tip, and
+   it never shifts off it (the reviewer, twice). */
+.rv-chat-sent { max-width: 100%; font-weight: 500; opacity: 0.72; overflow-wrap: anywhere; }
+.rv-chat-sent.is-alone { opacity: 1; }
+.rv-chat-grow { display: grid; max-width: 272px; }
+.rv-chat-grow::after {
+  content: attr(data-value) " ";
+  visibility: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rv-chat-input,
+.rv-chat-grow::after {
+  grid-area: 1 / 1;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 500;
+  line-height: 21px;
+}
+.rv-chat-input {
+  resize: none;
+  overflow: hidden;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+.rv-chat-input::placeholder { color: inherit; opacity: 0.62; }
+
+/* Reactions: the loop pins the spot to the surface; this floats the emoji up
+   from it with a little sideways drift, then lets it go. */
+.rv-reaction { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
+.rv-reaction > span {
+  position: absolute;
+  font-size: 30px;
+  line-height: 1;
+  translate: -50% -50%;
+  animation: rv-react-float 1600ms var(--rv-ease) both;
+}
+/* A thumbs down is one, still: it appears, dips a little and goes. */
+.rv-reaction.is-quiet > span { font-size: 30px; animation: rv-react-quiet 1600ms var(--rv-ease) both; }
+@keyframes rv-react-quiet {
+  0% { transform: translateY(-6px); opacity: 0; }
+  15%, 70% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(10px); opacity: 0; }
+}
+@keyframes rv-react-float {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+  14% { transform: translate(0, -10px) scale(1.2); opacity: 1; }
+  60% { opacity: 1; }
+  100% { transform: translate(var(--rv-drift, 0), var(--rv-rise, -110px)) scale(0.9); opacity: 0; }
+}
+
+/* The reaction wheel (E): eight emoji on a ring round where the pointer was. */
+.rv-wheel { position: fixed; z-index: 70; width: 0; height: 0; }
+.rv-wheel-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  translate: -50% -50%;
+}
+.rv-wheel-item {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-lg), 0 0 0 1px var(--rv-border);
+  font-size: 22px;
+  cursor: pointer;
+  transform: translate(var(--rv-wx), var(--rv-wy));
+  transition: transform 140ms var(--rv-ease), box-shadow 140ms var(--rv-ease);
+  animation: rv-wheel-in 220ms var(--rv-ease) backwards;
+  animation-delay: calc(var(--rv-wi) * 14ms);
+}
+.rv-wheel-item:hover,
+.rv-wheel-item:focus-visible { transform: translate(var(--rv-wx), var(--rv-wy)) scale(1.22); outline: 0; box-shadow: var(--rv-shadow-lg), 0 0 0 2px var(--rv-fg); }
+.rv-wheel-item:active { transform: translate(var(--rv-wx), var(--rv-wy)) scale(1.05); }
+@keyframes rv-wheel-in { from { transform: translate(0, 0) scale(0.4); opacity: 0; } }
+/* Each reaction wears its key, so the wheel teaches 1 to 8 as it's used. */
+.rv-wheel-item kbd,
+.rv-board-menu-reactions kbd {
+  position: absolute;
+  font: inherit;
+  font-weight: 600;
+  color: var(--rv-muted-fg);
+  pointer-events: none;
+}
+.rv-board-menu-reactions kbd { left: 0; right: 0; bottom: 2px; font-size: 9px; line-height: 1; }
+.rv-wheel-item kbd { right: -3px; bottom: -3px; min-width: 16px; height: 16px; display: grid; place-items: center; border-radius: 999px; background: var(--rv-card); box-shadow: 0 0 0 1px var(--rv-border); font-size: 10px; line-height: 1; }
+.rv-chat-note {
+  position: fixed;
+  z-index: 70;
+  margin: 19px 0 0 14px;
+  padding: 6px 11px;
+  border-radius: 3px 16px 16px 16px;
+  background: var(--rv-fg);
+  color: var(--rv-card);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--rv-shadow-lg);
+  pointer-events: none;
+}
+
+/* The board's right-click menu (presence-chat.tsx): Chat, reactions, the
+   board's rows for the spot. Opens AT the pointer. */
+.rv-board-menu { position: fixed; z-index: 75; width: 248px; transform-origin: 0 0; animation: rv-chat-in 140ms var(--rv-ease); }
+.rv-board-menu kbd { font: inherit; font-size: 11px; color: var(--rv-muted-fg); }
+.rv-board-menu .rv-menu-item:focus-visible { outline: none; background: var(--rv-muted); }
+.rv-board-menu-icon { width: 18px; text-align: center; font-size: 13px; line-height: 1; color: var(--rv-muted-fg); }
+.rv-board-menu-reactions { display: grid; grid-template-columns: repeat(8, 1fr); padding: 2px 2px 4px; }
+.rv-board-menu-reactions button { position: relative; height: 38px; padding-bottom: 9px; border-radius: 9px; font-size: 17px; line-height: 1; transition: transform var(--rv-fast) var(--rv-ease), background var(--rv-fast) var(--rv-ease); }
+.rv-board-menu-reactions button:hover, .rv-board-menu-reactions button:focus-visible { outline: none; background: var(--rv-muted); transform: scale(1.18); }
+.rv-board-menu-note { padding: 8px 12px; font-size: 13px; color: var(--rv-muted-fg); }
+.rv-board-menu-foot { margin: 6px -6px -6px; padding: 7px 12px; border-top: 1px solid var(--rv-border); font-size: 11px; color: var(--rv-muted-fg); }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-presence-avatar, .rv-presence-trigger, .rv-cursor, .rv-presence-menu, .rv-presence-track { transition: none; }
+  .rv-chat, .rv-wheel-item, .rv-board-menu { animation: none; transition: none; }
+  .rv-cursor-label.is-typing::after { animation: none; }
+  /* A reaction still shows, still goes: it fades in place instead of flying. */
+  .rv-reaction > span, .rv-reaction.is-quiet > span { animation: rv-react-fade 1600ms linear both; }
+}
+@keyframes rv-react-fade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }

@@ -1,0 +1,71 @@
+# Rebuilds the review board's prebuilt preview shots after a push to main.
+#
+# ⚠ THIS IS DELIBERATELY NOT PART OF THE DEPLOY. Shots are a cache, not a build
+# artifact — Vercel ships as it always did, and this job catches up afterwards.
+# A screen whose shot isn't uploaded yet simply boots live in the board and
+# self-captures, exactly as the whole board behaved before any of this existed.
+# So the window between a push and this finishing is a slower board, never a
+# broken one, and nobody's edit ever waits on a screenshot.
+#
+# Cost is proportional to what changed, not to the board: names are content-
+# addressed, so only screens whose code moved get re-shot. Measured 2026-08-13 —
+# a cold build is 388 shots in ~70s / 15MB; a page edit is ~32; a route added to
+# App.tsx is 0.
+#
+# Secrets (Settings → Secrets and variables → Actions):
+#   SHOTS_SUPABASE_URL   https://<project>.supabase.co
+#   SHOTS_SERVICE_KEY    the service_role key — write access to the bucket
+name: Review shots
+
+on:
+  push:
+    branches: [main]
+    # Wiki and doc commits can't change a screen, and this repo has a lot of them.
+    paths:
+      - "__DS_APP_DIR__/**"
+      - ".github/workflows/review-shots.yml"
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Reshoot every screen, ignoring the index"
+        type: boolean
+        default: false
+
+# One at a time: two runs would race on the index (the single mutable object in
+# the store). The shots themselves are content-addressed and can't conflict.
+concurrency:
+  group: review-shots
+  cancel-in-progress: false
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: __DS_APP_DIR__
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: __DS_APP_DIR__/package-lock.json
+
+      - run: npm ci
+
+      # playwright-core ships no browser. The installer is the LOCKFILE'S OWN
+      # (no version here): a pinned one drifted from the dependency once the
+      # lockfile moved to 1.63, and a mismatched revision fails at launch, not
+      # at install.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - run: npm run build
+
+      - name: Build and upload shots
+        env:
+          SHOTS_SUPABASE_URL: ${{ secrets.SHOTS_SUPABASE_URL }}
+          SHOTS_SERVICE_KEY: ${{ secrets.SHOTS_SERVICE_KEY }}
+        run: npx tsx scripts/build-shots.ts ${{ inputs.all && '--all' || '' }}

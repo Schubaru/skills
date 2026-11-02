@@ -1,0 +1,1468 @@
+{
+  "catalogVersion": "1.1.0",
+  "lastVerified": "2026-09-29",
+  "severity": {
+    "P1": "Breaks a platform convention users rely on, accessibility, or a platform requirement.",
+    "P2": "Clearly non-native; users will feel it.",
+    "P3": "Polish; brings the screen fully current."
+  },
+  "evidenceLevels": {
+    "V": "Verified on a simulator/emulator render",
+    "C": "Inferred from source code",
+    "W": "Inferred from a web render of the prototype"
+  },
+  "rules": [
+    {
+      "id": "IOS-NAV-01",
+      "platform": "ios",
+      "category": "navigation",
+      "title": "Custom or JS tab bar instead of system tab bar",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "tabs.js",
+          "tabs.custom (web bottom <nav>)",
+          "no tabs.native"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Use the system tab bar so it gets the floating Liquid Glass treatment, minimize-on-scroll, the search and prominent tab roles, and accessibility for free.",
+      "implementation": {
+        "rn-expo": "NativeTabs from expo-router/unstable-native-tabs",
+        "flutter": "CupertinoTabScaffold (cupertino_ui); Liquid Glass needs a third-party package or platform view",
+        "swiftui": "TabView with Tab",
+        "web": "Prototype: render an iOS variant of the dock as a floating glass pill (<=5 tabs) above content"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/tab-bars",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-NAV-02",
+      "platform": "ios",
+      "category": "navigation",
+      "title": "More than 5 tabs, or a tab that performs an action",
+      "severity": "P2",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "bottom nav with >5 items",
+          "tab labelled as an action (New, Add, Compose)"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Keep the tab bar to 5 destinations. Actions belong in the toolbar; a special destination (e.g. cart) takes the iOS 27 prominent tab role on the trailing edge.",
+      "implementation": {
+        "rn-expo": "NativeTabs with <=5 NativeTabs.Trigger; move actions to header items",
+        "flutter": "CupertinoTabBar with <=5 items",
+        "swiftui": "TabView; Tab(role: .search) / prominent role",
+        "web": "Prototype: cap the iOS dock at 5 items"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2026/269/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-NAV-03",
+      "platform": "ios",
+      "category": "navigation",
+      "title": "Search not using the search tab role or toolbar search where search is primary",
+      "severity": "P3",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "search field present; needs a call on whether search is the primary task"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Where search is a primary task, give it the search tab role (visually separated from the other tabs) or a toolbar search field.",
+      "implementation": {
+        "rn-expo": "NativeTabs.Trigger role=\"search\" or Stack.SearchBar",
+        "flutter": "CupertinoSearchTextField in the nav bar",
+        "swiftui": "Tab(role: .search) / .searchable",
+        "web": "Prototype: iOS variant puts search in its own tab slot"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-NAV-04",
+      "platform": "ios",
+      "category": "navigation",
+      "title": "Hamburger or side drawer as primary navigation on iPhone",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "drawer navigator",
+          "hamburger icon"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V",
+        "W"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Replace the drawer with a tab bar of up to 5 top-level destinations; iPhone users do not look for a hamburger.",
+      "implementation": {
+        "rn-expo": "NativeTabs instead of expo-router/drawer",
+        "flutter": "CupertinoTabScaffold",
+        "swiftui": "TabView",
+        "web": "Prototype: drop the hamburger on the iOS variant"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/tab-bars",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-NAV-05",
+      "platform": "ios",
+      "category": "navigation",
+      "title": "Custom back button replacing system back",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "headerLeft",
+          "custom chevron/arrow back",
+          "navigate(-1)"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Use the system back button: it keeps the edge-swipe back gesture, the long-press history menu, and its own glass group in the toolbar.",
+      "implementation": {
+        "rn-expo": "Stack screen with the default back button (remove headerLeft)",
+        "flutter": "CupertinoNavigationBar automaticallyImplyLeading",
+        "swiftui": "NavigationStack default back",
+        "web": "Prototype: iOS variant shows a chevron-only back in its own glass group, left-aligned"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-BAR-01",
+      "platform": "ios",
+      "category": "bars",
+      "title": "Opaque custom header or tab background blocking Liquid Glass and the scroll edge effect",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "headerStyle backgroundColor",
+          "sticky/fixed top bar with an opaque bg and no blur"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Let content scroll under a transparent bar; the system applies the scroll edge effect and glass. Remove opaque header backgrounds.",
+      "implementation": {
+        "rn-expo": "headerTransparent: true (Stack) and drop headerStyle.backgroundColor",
+        "flutter": "CupertinoNavigationBar with transparent background",
+        "swiftui": "remove .toolbarBackground(.visible)",
+        "web": "Prototype: iOS variant top bar transparent over content with a soft edge fade"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-BAR-02",
+      "platform": "ios",
+      "category": "bars",
+      "title": "More than 3 visible trailing toolbar actions with no overflow",
+      "severity": "P2",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "top-bar trailing interactive count > 3",
+          "headerRight with >=4 buttons"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Show at most 3 trailing actions; send the rest to overflow with ToolbarOverflowMenu / visibilityPriority, and pin the one critical action with topBarPinnedTrailing.",
+      "implementation": {
+        "rn-expo": "<=3 header items + a native menu for the rest",
+        "flutter": "CupertinoNavigationBar trailing with a pull-down",
+        "swiftui": "ToolbarOverflowMenu, .visibilityPriority, topBarPinnedTrailing",
+        "web": "Prototype: iOS variant keeps 3 trailing icons max, rest behind an ellipsis"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2026/269/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-BAR-03",
+      "platform": "ios",
+      "category": "bars",
+      "title": "Ellipsis button used for something other than overflow",
+      "severity": "P3",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "ellipsis icon present; needs a call on what it opens"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Reserve the ellipsis for overflow. Give a single action its own icon or label.",
+      "implementation": {
+        "rn-expo": "Use a named icon for single actions",
+        "flutter": "Named CupertinoButton",
+        "swiftui": "Button with its own SF Symbol",
+        "web": "Prototype: replace the ellipsis with the action's own icon"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2026/269/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-GLS-01",
+      "platform": "ios",
+      "category": "glass",
+      "title": "Glass layered on glass",
+      "severity": "P2",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "element with backdrop-filter inside another element with backdrop-filter"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "overlay",
+      "recommendation": "One glass layer per stack. Put controls directly on the bar's glass; group them with GlassEffectContainer instead of nesting.",
+      "implementation": {
+        "rn-expo": "One GlassView; group with GlassContainer (expo-glass-effect)",
+        "flutter": "One BackdropFilter layer",
+        "swiftui": "GlassEffectContainer, one .glassEffect per group",
+        "web": "Prototype: remove the inner backdrop-blur; keep the outer one"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-GLS-02",
+      "platform": "ios",
+      "category": "glass",
+      "title": "Glass or custom blur applied to content-layer elements",
+      "severity": "P2",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "backdrop-filter on an element that is not a bar, sheet or control"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "content",
+      "recommendation": "Glass belongs to the control and navigation layer. Use solid or grouped backgrounds for cards and rows.",
+      "implementation": {
+        "rn-expo": "Plain View background for cards",
+        "flutter": "Solid Container color",
+        "swiftui": "No .glassEffect on content",
+        "web": "Prototype: drop backdrop-blur on cards and list rows"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-GLS-03",
+      "platform": "ios",
+      "category": "glass",
+      "title": "Text over translucent surfaces fails legibility at clear intensity or with Reduce Transparency",
+      "severity": "P1",
+      "detect": {
+        "method": "device",
+        "signals": [
+          "render at clear + tinted glass intensity, Reduce Transparency, Increase Contrast"
+        ]
+      },
+      "evidenceRequired": [
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Verify legibility at both ends of the iOS 27 glass intensity slider and with Reduce Transparency and Increase Contrast; use vibrant label colors on glass.",
+      "implementation": {
+        "rn-expo": "Use PlatformColor('label') on glass; test with accessibility settings",
+        "flutter": "Test with MediaQuery.highContrast",
+        "swiftui": "Use .foregroundStyle(.primary) on glass",
+        "web": "Prototype: n/a (needs a device render)"
+      },
+      "source": "https://www.cultofmac.com/news/liquid-glass-changes-ios-27-macos-27",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-MNU-01",
+      "platform": "ios",
+      "category": "menus",
+      "title": "Primary actions hidden inside a pull-down menu",
+      "severity": "P1",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "menu trigger in the top bar; needs a call on what it hides"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Keep the view's primary actions visible as buttons; a pull-down holds related secondary commands only.",
+      "implementation": {
+        "rn-expo": "Promote the primary action to its own header button",
+        "flutter": "Visible CupertinoButton",
+        "swiftui": "Visible ToolbarItem",
+        "web": "Prototype: surface the primary action as a button"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-MNU-02",
+      "platform": "ios",
+      "category": "menus",
+      "title": "Pull-down menu with fewer than 3 items",
+      "severity": "P3",
+      "detect": {
+        "method": "device",
+        "signals": [
+          "open-menu capture item count"
+        ]
+      },
+      "evidenceRequired": [
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "A pull-down needs at least 3 items; with 1 or 2, show plain buttons.",
+      "implementation": {
+        "rn-expo": "Plain header buttons",
+        "flutter": "Plain CupertinoButtons",
+        "swiftui": "Plain Buttons",
+        "web": "Prototype: replace the menu with 1-2 buttons"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-MNU-03",
+      "platform": "ios",
+      "category": "menus",
+      "title": "Custom JS dropdown or popover instead of a native menu (UIMenu)",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "menu.custom",
+          "no menu.native"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Use a native menu: it gets the glass material, the source-anchored morph, haptics, and VoiceOver for free.",
+      "implementation": {
+        "rn-expo": "@expo/ui ContextMenu (SwiftUI) or Link.Menu",
+        "flutter": "CupertinoContextMenu / pull-down via platform view",
+        "swiftui": "Menu { }",
+        "web": "Prototype: iOS variant draws the menu as a glass pull-down anchored to its trigger"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/menus",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-MNU-04",
+      "platform": "ios",
+      "category": "menus",
+      "title": "Mutually exclusive choice shown without current-selection state",
+      "severity": "P2",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "radiogroup/tablist/listbox with no aria-checked/selected/pressed/current on any option"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "content",
+      "recommendation": "Use a pop-up button: it shows the current value and checkmarks the selected item.",
+      "implementation": {
+        "rn-expo": "@expo/ui Picker (menu style)",
+        "flutter": "CupertinoPicker in a sheet, or a pop-up via platform view",
+        "swiftui": "Picker(.menu)",
+        "web": "Prototype: show the current value on the trigger and a checkmark in the list"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-MNU-05",
+      "platform": "ios",
+      "category": "menus",
+      "title": "Command reachable only via long-press context menu",
+      "severity": "P1",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "onLongPress/context menu present; needs a call on whether each command exists elsewhere"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "content",
+      "recommendation": "Context menus are shortcuts. Every command in one must also be reachable from visible UI.",
+      "implementation": {
+        "rn-expo": "Mirror context-menu items in a visible button or header menu",
+        "flutter": "Visible action row",
+        "swiftui": "Visible button + .contextMenu",
+        "web": "Prototype: add a visible path for each long-press command"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/context-menus",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-MNU-06",
+      "platform": "ios",
+      "category": "menus",
+      "title": "Destructive menu item not using the destructive role or missing confirmation",
+      "severity": "P2",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "Delete/Remove/Sign out action; needs a call on role + confirmation"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "overlay",
+      "recommendation": "Mark destructive items with the destructive role (red) and confirm with a dialog anchored to the source.",
+      "implementation": {
+        "rn-expo": "menu item destructive: true + Alert.alert confirm",
+        "flutter": "CupertinoActionSheetAction(isDestructiveAction: true) + dialog",
+        "swiftui": "Button(role: .destructive) + .confirmationDialog",
+        "web": "Prototype: red destructive item + a confirm step"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/menus",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-SHT-01",
+      "platform": "ios",
+      "category": "sheets",
+      "title": "Custom bottom sheet instead of a system sheet with detents",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "sheet.custom",
+          "no sheet.native"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Use a system sheet with detents; partial-height sheets get the inset glass background and can zoom from their source toolbar item.",
+      "implementation": {
+        "rn-expo": "Stack screen presentation: 'formSheet' + sheetAllowedDetents",
+        "flutter": "showCupertinoModalPopup or platform view",
+        "swiftui": "presentationDetents",
+        "web": "Prototype: iOS variant sheet inset from the edges with a grabber"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-LAY-01",
+      "platform": "ios",
+      "category": "layout",
+      "title": "Interactive content inside unsafe areas (status bar, Dynamic Island, home indicator)",
+      "severity": "P1",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "interactive element intersecting the top 59pt or bottom 34pt of the iPhone viewport"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "overlay",
+      "recommendation": "Keep controls inside the safe area; only backgrounds bleed to the edges.",
+      "implementation": {
+        "rn-expo": "useSafeAreaInsets() padding",
+        "flutter": "SafeArea",
+        "swiftui": "safeAreaInset / default layout",
+        "web": "Prototype: pad controls by env(safe-area-inset-*) with a device-sized minimum"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/layout",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-TYP-01",
+      "platform": "ios",
+      "category": "typography",
+      "title": "Fixed font sizes that ignore Dynamic Type",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "allowFontScaling={false}",
+          "px font sizes",
+          "TextScaler.noScaling"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "content",
+      "recommendation": "Use text styles that scale with Dynamic Type; never disable font scaling.",
+      "implementation": {
+        "rn-expo": "Remove allowFontScaling={false}; cap with maxFontSizeMultiplier >= 1.5 only where layout breaks",
+        "flutter": "Theme text styles; no TextScaler.noScaling",
+        "swiftui": "Font.TextStyle (.body, .headline)",
+        "web": "Prototype: rem-based text styles instead of arbitrary px"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/typography",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-ICN-01",
+      "platform": "ios",
+      "category": "icons",
+      "title": "Non-SF Symbols icons in system chrome (tab bar, toolbar, menus)",
+      "severity": "P3",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "icons.generic in screen/chrome files",
+          "no icons.sf"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Use SF Symbols in system chrome so weight, scale and rendering modes match the system.",
+      "implementation": {
+        "rn-expo": "sf icons on NativeTabs / SymbolView (expo-symbols)",
+        "flutter": "CupertinoIcons",
+        "swiftui": "Image(systemName:)",
+        "web": "Prototype: map each chrome icon to its SF Symbol name for the iOS variant"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/sf-symbols",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "IOS-TGT-01",
+      "platform": "ios",
+      "category": "targets",
+      "title": "Hit target under 44x44pt",
+      "severity": "P1",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "interactive element smaller than 44x44 (inline text links excluded)"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "content",
+      "recommendation": "Make every control at least 44x44pt (the visible glyph can stay small; pad the hit area).",
+      "implementation": {
+        "rn-expo": "hitSlop or minWidth/minHeight 44",
+        "flutter": "kMinInteractiveDimensionCupertino (44)",
+        "swiftui": ".frame(minWidth: 44, minHeight: 44) / .contentShape",
+        "web": "Prototype: min-h-11 min-w-11 on icon buttons"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/buttons",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-NAV-01",
+      "platform": "android",
+      "category": "navigation",
+      "title": "iOS-style or JS tab bar instead of an M3 navigation bar with pill indicator",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "tabs.js",
+          "tabs.custom",
+          "no tabs.native"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Use the M3 Expressive flexible navigation bar: pill active indicator, 3-5 destinations, Material Symbols.",
+      "implementation": {
+        "rn-expo": "NativeTabs with md icons (BottomNavigationView)",
+        "flutter": "NavigationBar (material_ui)",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant = 64dp full-width bar, pill behind the active icon"
+      },
+      "source": "https://9to5google.com/2025/05/14/material-3-expressive-navigation/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-NAV-02",
+      "platform": "android",
+      "category": "navigation",
+      "title": "Tall legacy navigation bar instead of the flexible (short) navigation bar",
+      "severity": "P3",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "bottom nav height >= 76dp"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Use the shorter flexible navigation bar (64dp); the original tall bar is deprecated in M3 Expressive.",
+      "implementation": {
+        "rn-expo": "NativeTabs (flexible bar on current material components)",
+        "flutter": "NavigationBar height 64 / flexible variant",
+        "swiftui": "n/a",
+        "web": "Prototype: Android bar height 64dp"
+      },
+      "source": "https://9to5google.com/2025/05/14/material-3-expressive-navigation/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-NAV-03",
+      "platform": "android",
+      "category": "navigation",
+      "title": "No navigation rail or adaptive layout at 600dp+",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "no rail / window-size adaptation in screen or chrome files"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "At 600dp+ swap the bar for a navigation rail and adapt layouts; Android 17 removes the opt-out from resizability and orientation restrictions on large screens.",
+      "implementation": {
+        "rn-expo": "useWindowDimensions() width >= 600 -> rail layout",
+        "flutter": "NavigationRail when width >= 600",
+        "swiftui": "n/a",
+        "web": "Prototype: a md: breakpoint that swaps the bar for a rail"
+      },
+      "source": "https://developer.android.com/blog/posts/prepare-your-app-for-the-resizability-and-orientation-changes-in-android-17",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-NAV-04",
+      "platform": "android",
+      "category": "navigation",
+      "title": "Custom back chevron or Back text button; JS back interception blocking predictive back",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "back.custom",
+          "back.intercept"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Rely on system back (gesture + predictive back animation, on by default at API 36). If the top app bar shows an up arrow, use the M3 navigation icon, never a chevron or 'Back' text.",
+      "implementation": {
+        "rn-expo": "Stack default header back; replace BackHandler with usePreventRemove only when a guard is required",
+        "flutter": "AppBar automaticallyImplyLeading; PopScope(canPop: true)",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant = arrow_back icon button at the start of the top app bar"
+      },
+      "source": "https://developer.android.com/about/versions/16/behavior-changes-16",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-NAV-05",
+      "platform": "android",
+      "category": "navigation",
+      "title": "Hamburger drawer as primary navigation on phone",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "drawer navigator",
+          "hamburger icon"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V",
+        "W"
+      ],
+      "zone": "top-bar",
+      "recommendation": "M3 Expressive drops the drawer as primary phone navigation; use the navigation bar (rail at 600dp+).",
+      "implementation": {
+        "rn-expo": "NativeTabs instead of expo-router/drawer",
+        "flutter": "NavigationBar",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant replaces the hamburger with the nav bar"
+      },
+      "source": "https://9to5google.com/2025/05/14/material-3-expressive-navigation/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-BAR-01",
+      "platform": "android",
+      "category": "bars",
+      "title": "More than 3 top app bar action icons with no vertical overflow",
+      "severity": "P2",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "top-bar trailing interactive count > 3",
+          "headerRight with >=4 buttons"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Show at most 3 action icons; move the rest into a vertical overflow (more_vert) menu.",
+      "implementation": {
+        "rn-expo": "<=3 headerRight icons + @expo/ui DropdownMenu for the rest",
+        "flutter": "AppBar actions <=3 + PopupMenuButton",
+        "swiftui": "n/a",
+        "web": "Prototype: 3 icons max, rest behind more_vert"
+      },
+      "source": "https://m3.material.io/components/app-bars/guidelines",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-BAR-02",
+      "platform": "android",
+      "category": "bars",
+      "title": "iOS text-button patterns (Edit, Done, Cancel) in the top bar",
+      "severity": "P3",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "top-bar control labelled Edit/Done/Cancel/Save"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Use icon buttons in the top app bar (close, check) or a FAB/button in content instead of iOS-style text buttons.",
+      "implementation": {
+        "rn-expo": "Platform.select header items: icon buttons on Android",
+        "flutter": "IconButton(Icons.close/check)",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant swaps text buttons for close/check icons"
+      },
+      "source": "https://m3.material.io/components/app-bars/guidelines",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-EDG-01",
+      "platform": "android",
+      "category": "layout",
+      "title": "Not edge-to-edge: solid system bar backgrounds, content under the gesture bar, insets unhandled",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "edgeToEdgeEnabled:false",
+          "windowOptOutEdgeToEdgeEnforcement",
+          "fitsSystemWindows",
+          "no safe-area handling"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Draw edge-to-edge and pad content with window insets; the opt-out is disabled for apps targeting API 36 on Android 16+.",
+      "implementation": {
+        "rn-expo": "Remove edgeToEdgeEnabled:false; pad with useSafeAreaInsets()",
+        "flutter": "SafeArea + SystemUiMode.edgeToEdge",
+        "swiftui": "n/a",
+        "web": "n/a"
+      },
+      "source": "https://developer.android.com/about/versions/16/behavior-changes-16",
+      "lastVerified": "2026-09-29",
+      "status": "active",
+      "stacks": [
+        "rn-expo",
+        "flutter",
+        "swift"
+      ]
+    },
+    {
+      "id": "AND-MNU-01",
+      "platform": "android",
+      "category": "menus",
+      "title": "iOS-style action sheet instead of an M3 menu or modal bottom sheet",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "ActionSheetIOS / showActionSheetWithOptions / custom ActionSheet with no platform branch"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "On Android present choices as an M3 vertical menu anchored to the trigger, or a modal bottom sheet with a drag handle.",
+      "implementation": {
+        "rn-expo": "Platform.select: iOS action sheet, Android @expo/ui DropdownMenu or ModalBottomSheet",
+        "flutter": "showModalBottomSheet / MenuAnchor",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant = anchored rounded vertical menu"
+      },
+      "source": "https://9to5google.com/2025/11/22/material-3-expressive-menus/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-MNU-02",
+      "platform": "android",
+      "category": "menus",
+      "title": "Custom or baseline dropdown instead of an M3E vertical menu",
+      "severity": "P3",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "menu.custom",
+          "no menu.native"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Use the M3 Expressive vertical menu: rounded corners, standard/vibrant color, grouped sections, selection states, submenu motion.",
+      "implementation": {
+        "rn-expo": "@expo/ui/jetpack-compose DropdownMenu",
+        "flutter": "MenuAnchor + MenuItemButton (material_ui); M3E shapes may need a community package",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant menu = 16dp radius, grouped sections with gaps"
+      },
+      "source": "https://m3.material.io/components/menus/specs",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-MNU-03",
+      "platform": "android",
+      "category": "menus",
+      "title": "Horizontal ellipsis for overflow instead of vertical (more_vert)",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "ellipsis.horizontal with no platform branch"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Android overflow is the vertical three-dot (more_vert).",
+      "implementation": {
+        "rn-expo": "Platform.OS === 'android' ? more-vert : ellipsis",
+        "flutter": "Icons.more_vert on Android",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant uses more_vert"
+      },
+      "source": "https://m3.material.io/components/menus/guidelines",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-MNU-04",
+      "platform": "android",
+      "category": "menus",
+      "title": "Choice lists missing selected state (check or radio semantics)",
+      "severity": "P2",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "radiogroup/tablist/listbox with no checked/selected state"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "content",
+      "recommendation": "Give selectable items a visible selected state (check or radio) and the matching semantics.",
+      "implementation": {
+        "rn-expo": "@expo/ui selectable menu items / RadioButton",
+        "flutter": "RadioListTile / CheckedPopupMenuItem",
+        "swiftui": "n/a",
+        "web": "Prototype: aria-checked + a check mark on the chosen item"
+      },
+      "source": "https://m3.material.io/components/menus/specs",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-MNU-05",
+      "platform": "android",
+      "category": "menus",
+      "title": "Screen where creation is the primary task lacks a FAB, FAB menu, or split button",
+      "severity": "P3",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "create/add action present with no FAB; needs a call on whether creation is primary"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Put the primary create action in a FAB (FAB menu for 2-6 variants, or a split button).",
+      "implementation": {
+        "rn-expo": "@expo/ui/jetpack-compose FloatingActionButton on Android",
+        "flutter": "FloatingActionButton",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant FAB bottom-end, above the nav bar"
+      },
+      "source": "https://m3.material.io/components/fab-menu/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-SRC-01",
+      "platform": "android",
+      "category": "search",
+      "title": "Full-width search field instead of the M3E search app bar where search is primary",
+      "severity": "P3",
+      "detect": {
+        "method": "judgment",
+        "signals": [
+          "search field present; needs a call on whether search is primary"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "top-bar",
+      "recommendation": "Use the M3 Expressive search app bar: a thick pill field with the nav icon and avatar outside the pill.",
+      "implementation": {
+        "rn-expo": "Stack.SearchBar (Android: material search bar)",
+        "flutter": "SearchAnchor.bar",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant = pill search bar, avatar outside"
+      },
+      "source": "https://m3.material.io/components/search/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-DYN-01",
+      "platform": "android",
+      "category": "color",
+      "title": "System chrome ignores dynamic color (warning only; brand color is valid)",
+      "severity": "P3",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "no dynamic color API near chrome"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Consider tinting system chrome from dynamic color (Material You); keeping brand color is a valid, deliberate choice.",
+      "implementation": {
+        "rn-expo": "useMaterialColors() from @expo/ui/jetpack-compose for chrome",
+        "flutter": "ColorScheme.fromSeed / DynamicColorBuilder",
+        "swiftui": "n/a",
+        "web": "n/a"
+      },
+      "source": "https://m3.material.io/styles/color/dynamic/choosing-a-source",
+      "lastVerified": "2026-09-29",
+      "status": "active",
+      "stacks": [
+        "rn-expo",
+        "flutter"
+      ]
+    },
+    {
+      "id": "AND-ICN-01",
+      "platform": "android",
+      "category": "icons",
+      "title": "SF Symbols-style icons on Android instead of Material Symbols",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "icons.sf with no md/material mapping or platform branch"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Use Material Symbols on Android.",
+      "implementation": {
+        "rn-expo": "NativeTabs Icon with both sf and md",
+        "flutter": "Icons.* (Material Symbols)",
+        "swiftui": "n/a",
+        "web": "Prototype: map each chrome icon to its Material Symbol for the Android variant"
+      },
+      "source": "https://m3.material.io/styles/icons/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-CTL-01",
+      "platform": "android",
+      "category": "controls",
+      "title": "iOS-style switch, segmented control, or picker wheel on Android",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "custom switch / segmented control / wheel picker with no platform branch"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "content",
+      "recommendation": "Use Material controls on Android: M3 switch, segmented buttons (button group), and menus or date/time dialogs instead of wheels.",
+      "implementation": {
+        "rn-expo": "RN Switch (native per platform); Platform.select segmented -> @expo/ui Android variant",
+        "flutter": "Switch.adaptive; SegmentedButton; showDatePicker",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant switch with thumb icon + track, segmented buttons"
+      },
+      "source": "https://m3.material.io/components/switch/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-SHT-01",
+      "platform": "android",
+      "category": "sheets",
+      "title": "Bottom sheet without drag handle or not an M3 modal bottom sheet",
+      "severity": "P3",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "sheet.custom",
+          "no sheet.native"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Use an M3 modal bottom sheet with a drag handle.",
+      "implementation": {
+        "rn-expo": "@expo/ui/jetpack-compose ModalBottomSheet",
+        "flutter": "showModalBottomSheet(showDragHandle: true)",
+        "swiftui": "n/a",
+        "web": "Prototype: Android variant sheet full-width, 28dp top radius, drag handle"
+      },
+      "source": "https://m3.material.io/components/bottom-sheets/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "AND-TGT-01",
+      "platform": "android",
+      "category": "targets",
+      "title": "Touch target under 48x48dp",
+      "severity": "P1",
+      "detect": {
+        "method": "geometry",
+        "signals": [
+          "interactive element smaller than 48x48 (inline text links excluded)"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W"
+      ],
+      "zone": "content",
+      "recommendation": "Make every touch target at least 48x48dp.",
+      "implementation": {
+        "rn-expo": "hitSlop or minHeight 48",
+        "flutter": "kMinInteractiveDimension (48)",
+        "swiftui": "n/a",
+        "web": "Prototype: min-h-12 min-w-12 on the Android variant"
+      },
+      "source": "https://support.google.com/accessibility/android/answer/7101858",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "X-PAR-01",
+      "platform": "cross",
+      "category": "parity",
+      "title": "Identical custom chrome on both platforms (native on neither)",
+      "severity": "P1",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "custom tab bar / header / menu chrome with no platform branch"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Render platform chrome natively per platform; share content, not chrome.",
+      "implementation": {
+        "rn-expo": "NativeTabs + native Stack headers on both",
+        "flutter": "Adaptive widgets or per-platform scaffolds",
+        "swiftui": "n/a",
+        "web": "Prototype: add a platform dimension (e.g. ?os=ios|android) and branch the chrome components"
+      },
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/ ; https://9to5google.com/2025/05/14/material-3-expressive-navigation/",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "X-PAR-02",
+      "platform": "cross",
+      "category": "parity",
+      "title": "Navigation or menu component with no platform branch where platforms diverge",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "custom nav/menu/sheet/action-sheet implementation",
+          "no Platform.OS/.ios/.android branch"
+        ]
+      },
+      "evidenceRequired": [
+        "C"
+      ],
+      "zone": "overlay",
+      "recommendation": "Branch navigation and menu components per platform (Platform.select or .ios/.android files) where iOS and Android conventions differ.",
+      "implementation": {
+        "rn-expo": "Platform.select or Component.ios.tsx / Component.android.tsx",
+        "flutter": "defaultTargetPlatform switch",
+        "swiftui": "n/a",
+        "web": "Prototype: branch these components on the platform dimension"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/menus ; https://m3.material.io/components/menus/specs",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "X-PAR-03",
+      "platform": "cross",
+      "category": "parity",
+      "title": "Action reachable on one platform but not the other",
+      "severity": "P1",
+      "detect": {
+        "method": "geometry+code",
+        "signals": [
+          "interactive labels present in one platform capture and missing in the other",
+          "iOS-only / Android-only API (ActionSheetIOS, @expo/ui/swift-ui, ToastAndroid, @expo/ui/jetpack-compose) with no platform guard"
+        ]
+      },
+      "evidenceRequired": [
+        "V",
+        "W",
+        "C"
+      ],
+      "zone": "content",
+      "recommendation": "Every action must exist on both platforms, even if placed differently.",
+      "implementation": {
+        "rn-expo": "Expose the action in both platform branches",
+        "flutter": "Expose in both",
+        "swiftui": "n/a",
+        "web": "Prototype: keep the action in both variants"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/menus ; https://m3.material.io/components/menus/guidelines",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "X-PAR-04",
+      "platform": "cross",
+      "category": "parity",
+      "title": "Same icon set used in system chrome on both platforms",
+      "severity": "P3",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "one generic icon set in chrome, no sf/md split"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "bottom-bar",
+      "recommendation": "Use SF Symbols in iOS chrome and Material Symbols in Android chrome.",
+      "implementation": {
+        "rn-expo": "NativeTabs Icon sf + md",
+        "flutter": "CupertinoIcons / Icons per platform",
+        "swiftui": "n/a",
+        "web": "Prototype: an icon map keyed by platform"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/sf-symbols ; https://m3.material.io/styles/icons/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    },
+    {
+      "id": "X-PAR-05",
+      "platform": "cross",
+      "category": "parity",
+      "title": "Custom JS modal used for alerts or confirmations instead of native dialogs",
+      "severity": "P2",
+      "detect": {
+        "method": "code",
+        "signals": [
+          "custom Modal/Dialog with confirm copy",
+          "no native Alert"
+        ]
+      },
+      "evidenceRequired": [
+        "C",
+        "V"
+      ],
+      "zone": "overlay",
+      "recommendation": "Use native alerts/dialogs for confirmations: platform styling, focus handling and accessibility for free.",
+      "implementation": {
+        "rn-expo": "Alert.alert(title, message, buttons)",
+        "flutter": "showAdaptiveDialog / AlertDialog.adaptive",
+        "swiftui": "alert / confirmationDialog",
+        "web": "Prototype: platform-styled confirm (iOS alert, Android M3 dialog)"
+      },
+      "source": "https://developer.apple.com/design/human-interface-guidelines/alerts ; https://m3.material.io/components/dialogs/overview",
+      "lastVerified": "2026-09-29",
+      "status": "active"
+    }
+  ],
+  "menuMatrix": [
+    {
+      "key": "destinations",
+      "intent": "Top-level destinations",
+      "ios": "Floating Liquid Glass tab bar, up to 5 tabs; search tab role; prominent tab role for a special destination",
+      "android": "Flexible navigation bar, 3 to 5 items, pill indicator; nav rail at 600dp+; no drawer as primary nav on phone",
+      "rnExpo": "NativeTabs with sf and md icons",
+      "rules": [
+        "IOS-NAV-01",
+        "IOS-NAV-02",
+        "IOS-NAV-04",
+        "AND-NAV-01",
+        "AND-NAV-02",
+        "AND-NAV-03",
+        "AND-NAV-05",
+        "X-PAR-01"
+      ]
+    },
+    {
+      "key": "secondary",
+      "intent": "Screen-level secondary actions",
+      "ios": "Toolbar items on glass, grouped; lower priority items via ToolbarOverflowMenu / visibilityPriority",
+      "android": "Top app bar icon actions (max 3) plus vertical overflow menu; floating toolbar for contextual tools",
+      "rnExpo": "Native header items; overflow via native menu",
+      "rules": [
+        "IOS-BAR-01",
+        "IOS-BAR-02",
+        "AND-BAR-01",
+        "AND-BAR-02"
+      ]
+    },
+    {
+      "key": "overflow",
+      "intent": "Overflow",
+      "ios": "Ellipsis, reserved for overflow only",
+      "android": "Vertical three-dot (more_vert) opening an M3E vertical menu",
+      "rnExpo": "Native menu wrapper per platform",
+      "rules": [
+        "IOS-BAR-03",
+        "AND-MNU-03"
+      ]
+    },
+    {
+      "key": "per-item",
+      "intent": "Per-item actions",
+      "ios": "Context menu on long-press with preview; must also exist elsewhere",
+      "android": "Visible trailing icon button opening a vertical menu; long-press enters multi-select with contextual top bar",
+      "rnExpo": "Expo Router Link.Menu on iOS; Compose DropdownMenu on Android",
+      "rules": [
+        "IOS-MNU-05"
+      ]
+    },
+    {
+      "key": "choose-one",
+      "intent": "Choose one of N (sort, filter, view)",
+      "ios": "Pop-up button showing current selection with checkmark",
+      "android": "Vertical menu with selectable items, or button group / segmented chips for 2 to 5 options",
+      "rnExpo": "@expo/ui picker or menu with selection state",
+      "rules": [
+        "IOS-MNU-04",
+        "AND-MNU-04",
+        "AND-CTL-01"
+      ]
+    },
+    {
+      "key": "create",
+      "intent": "Create with variants",
+      "ios": "Pull-down menu on \"+\" (3+ items)",
+      "android": "FAB menu (2 to 6 items) or split button",
+      "rnExpo": "Platform-branched component",
+      "rules": [
+        "AND-MNU-05",
+        "IOS-MNU-02"
+      ]
+    },
+    {
+      "key": "destructive",
+      "intent": "Destructive action",
+      "ios": "Destructive role (red) plus confirmation dialog anchored to source",
+      "android": "Confirmation dialog; destructive item separated in its own menu group",
+      "rnExpo": "Native Alert / platform dialog",
+      "rules": [
+        "IOS-MNU-06",
+        "X-PAR-05"
+      ]
+    },
+    {
+      "key": "rich",
+      "intent": "Many options or rich content",
+      "ios": "Sheet with detents, glass inset at partial height",
+      "android": "Modal bottom sheet with drag handle",
+      "rnExpo": "@expo/ui sheet or native bottom sheet",
+      "rules": [
+        "IOS-SHT-01",
+        "AND-SHT-01",
+        "AND-MNU-01"
+      ]
+    },
+    {
+      "key": "search",
+      "intent": "Search",
+      "ios": "Search tab or toolbar search field",
+      "android": "Search app bar (pill, nav icon and avatar outside)",
+      "rnExpo": "Stack.SearchBar / platform search component",
+      "rules": [
+        "IOS-NAV-03",
+        "AND-SRC-01"
+      ]
+    },
+    {
+      "key": "account",
+      "intent": "Account / profile menu",
+      "ios": "Toolbar button to a sheet or pull-down",
+      "android": "Avatar in search app bar or top bar opening a menu or sheet",
+      "rnExpo": "Platform-branched",
+      "rules": []
+    }
+  ]
+}

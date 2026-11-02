@@ -1,0 +1,32 @@
+{
+  "skill_name": "deviceroy",
+  "evals": [
+    {
+      "id": 1,
+      "name": "seeded-full-audit",
+      "prompt": "I've got an Expo app at {project}. Can you audit it for iOS vs Android platform fit (Liquid Glass on iOS 27, Material 3 Expressive on Android 17, menus included) and give me a report I can hand to the team? Don't change any of the app code.",
+      "expected_output": "A findings.json plus report-ios.html and report-android.html in the run folder of the project's workspace home where every seeded defect fires (JS tab bar, custom dropdown, iOS action sheet on Android, horizontal ellipsis on Android, custom back button, 5 toolbar icons), no unseeded P1 fires, no V evidence, app source untouched, deterministic on rerun, NativeTabs advice marked as requiring an upgrade (expo-router 6 installed).",
+      "files": [
+        "evals/fixtures/seeded-expo"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "clean-app-audit",
+      "prompt": "does my app at {project} feel native on iPhone and Android? do a proper platform audit, screen by screen. read-only please",
+      "expected_output": "report-ios.html and report-android.html with zero P1/P2 findings (the fixture uses NativeTabs, native menus, system sheets, Alert, RN Switch, a rail at 600dp+), app source untouched.",
+      "files": [
+        "evals/fixtures/clean-expo"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "scoped-settings",
+      "prompt": "Quick one: audit just the /settings screen of the app at {project} for iOS/Android menu treatments and platform differences. Nothing else.",
+      "expected_output": "Findings only for the settings screen: custom dropdown (IOS-MNU-03 / AND-MNU-02), iOS action sheet on Android (AND-MNU-01), custom back (IOS-NAV-05 / AND-NAV-04); a menu-treatment table for settings; no findings on other screens; app untouched.",
+      "files": [
+        "evals/fixtures/seeded-expo"
+      ]
+    }
+  ]
+}

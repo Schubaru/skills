@@ -1,0 +1,89 @@
+{
+  "$comment": "style-spec.json — the single input to the design system. Every generated file derives from this. Fields marked (opt) may be omitted; everything else is required. Remove $comment keys in the real file or leave them; the scripts ignore keys starting with $.",
+
+  "version": "1.0.0",
+  "name": "Acme Health",
+  "prefix": "acme",
+  "$prefix": "Used for CSS vars (--acme-…) and the Swift enum (AcmeTokens). kebab-case, 2–8 chars.",
+
+  "platforms": ["react-native"],
+  "$platforms": "One or more of: react-native | web | swiftui. Default when the user doesn't say: [\"react-native\"] (iOS).",
+
+  "output": "design-system",
+  "$output": "Folder at project root. Default design-system.",
+
+  "modes": ["light", "dark"],
+  "$modes": "[\"light\"] or [\"light\",\"dark\"]. Default both.",
+
+  "color": {
+    "primary": "#2563EB",
+    "secondary": null,
+    "accent": null,
+    "$seeds": "Hex seeds. secondary/accent (opt). The script generates 11-step ramps and snaps the seed into its nearest step so the exact brand hex appears.",
+    "neutral": "cool",
+    "$neutral": "cool | warm | pure",
+    "status": {
+      "success": "#16A34A",
+      "warning": "#F59E0B",
+      "danger": "#DC2626",
+      "info": "#0284C7",
+      "$status": "Override only if the brand has its own status hues. Defaults shown."
+    }
+  },
+
+  "type": {
+    "display": "Inter",
+    "body": "Inter",
+    "mono": "JetBrains Mono",
+    "$families": "Font family names as the platform will load them. Use \"System\" for SF Pro / system-ui.",
+    "staticWeights": false,
+    "$staticWeights": "true if the font ships per-weight files (Inter-SemiBold). Emits per-weight family names for RN/Swift.",
+    "baseSize": 17,
+    "$baseSize": "Default 16 web, 17 for iOS/RN.",
+    "ratio": 1.2,
+    "$ratio": "One of 1.125 | 1.2 | 1.25 | 1.333",
+    "density": "normal",
+    "$density": "normal | compact. compact scales component padding by 0.75, not the space primitives."
+  },
+
+  "space": {
+    "base": 4,
+    "$base": "4 or 8"
+  },
+
+  "shape": {
+    "radius": "soft",
+    "$radius": "sharp | soft | round | pill",
+    "border": "regular",
+    "$border": "hairline | regular — the default border weight components use"
+  },
+
+  "elevation": "medium",
+  "$elevation": "low | medium | high — scales shadow alpha/blur. low ≈ flat/bordered UIs.",
+
+  "feedback": {
+    "toastStyle": "strong",
+    "$toastStyle": "strong (filled) | subtle (tinted)"
+  },
+
+  "components": {
+    "tier": "core",
+    "$tier": "core | extended | custom",
+    "include": [],
+    "$include": "When tier is custom: Core is always built; list Extended component names to add, e.g. [\"SearchField\",\"Slider\",\"Banner\"]",
+    "exclude": [],
+    "$exclude": "Rare. Core components to skip, with a reason in notes."
+  },
+
+  "accessibility": {
+    "target": "AA",
+    "$target": "AA | AAA. Drives the contrast threshold in build_tokens.py (4.5 vs 7 for text)."
+  },
+
+  "sources": [
+    { "type": "figma", "fileKey": "abc123", "nodeId": "1:2", "note": "Home + Settings frames" }
+  ],
+  "$sources": "(opt) Where the style came from: figma | screenshot | description | codebase. Cited in DESIGN_SYSTEM.md.",
+
+  "notes": "Brand requires primary on white for all CTAs; no gradients."
+}

@@ -1,0 +1,84 @@
+/* The denied screen (2026-09-18). One card, centred, on the board's own
+   tokens — it is the board saying no, not a different product. Loaded by
+   request-access.tsx; review.css carries every token it uses. */
+
+.rv-folder-root .rv-page.rv-ask {
+  min-height: 100svh;
+  place-content: center;
+}
+
+.rv-ask-card {
+  max-width: 420px;
+  display: grid;
+  gap: 18px;
+  padding: 28px 26px;
+  border: 1.5px solid var(--rv-border);
+  border-radius: 18px;
+  background: var(--rv-card);
+  box-shadow: var(--rv-shadow-sm);
+}
+
+.rv-ask-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.rv-ask-line {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  color: var(--rv-muted-strong);
+}
+
+.rv-ask-form {
+  display: grid;
+  gap: 10px;
+}
+
+.rv-ask-label {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--rv-muted-strong);
+}
+
+.rv-ask-note {
+  width: 100%;
+  resize: vertical;
+}
+
+.rv-ask-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rv-broken);
+}
+
+.rv-ask-submit {
+  justify-self: start;
+}
+
+.rv-ask-foot {
+  display: grid;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1.5px solid var(--rv-border);
+}
+
+.rv-ask-who {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--rv-muted-strong);
+}
+
+.rv-ask-link {
+  font-size: 12.5px;
+  color: var(--rv-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  justify-self: start;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}

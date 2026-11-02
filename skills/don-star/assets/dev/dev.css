@@ -1,0 +1,805 @@
+/*
+  Dev mode panel chrome.
+
+  It wears the REVIEW BOARD's design system, not a browser-devtools one (the reviewer,
+  2026-08-13: "less browser dev mode, more a design tool dev mode" → "the ui just looks
+  dated and boring. make it look nicer like a design tool"). On the board the
+  panel renders inside `.rv-root` and inherits every `--rv-*` token, dark theme
+  included; on a bare product route `.rvdev-root` defines the same tokens
+  itself. That block is the only place values repeat, and it copies review.css's
+  LIGHT palette on purpose — the panel must never follow the PRODUCT's theme,
+  or you could never tell whose color you were looking at.
+
+  What makes it read as an inspector rather than a form:
+    · values RIGHT-aligned in a tabular mono column, so numbers line up
+    · groups separated by space, not by a rule under every section
+    · every row is a copy target, with a hover fill that says so
+    · 130ms ease-out on state, the board's own motion
+
+  Every selector is namespaced `rvdev` — the standalone-HTML export filters
+  these rules back out by that substring (dev/export.ts), so the panel can never
+  leak into an artifact a developer receives.
+
+  No Tailwind: the panel has to render correctly while inspecting a page whose
+  own stylesheet is mid-edit.
+*/
+
+.rvdev-root {
+  /* Fallbacks only — inside .rv-root these are already defined and inherited. */
+  --rv-bg: oklch(0.956 0.0045 247.9);
+  --rv-card: oklch(0.9965 0.0017 247.84);
+  --rv-muted: oklch(0.924 0.0058 247.9);
+  --rv-border: oklch(0.9147 0.0063 255.48);
+  --rv-fg: oklch(0.2547 0.0087 255.59);
+  --rv-muted-fg: oklch(0.5611 0.0072 255.5);
+  --rv-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --rv-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --rv-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rv-fast: 130ms;
+
+  /* Selection blue and measurement magenta are deliberately OUTSIDE any
+     product palette: a highlight must never be mistaken for something the
+     screen itself renders. Same reason a design tool's are what they are. */
+  --rvdev-select: #0d99ff;
+  --rvdev-measure: #e5006d;
+  --rvdev-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  /* A pass-through layer: only the panel takes pointer events, so the board
+     underneath keeps every gesture (see overlay.tsx on why there is no
+     event-catching overlay). */
+  pointer-events: none;
+  font: 13px/1.45 "Hanken Grotesk", "Hanken Grotesk Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--rv-fg);
+}
+.rvdev-root *,
+.rvdev-root *::before,
+.rvdev-root *::after {
+  box-sizing: border-box;
+}
+/* Zero-specificity reset (:where), the same trick review.css uses — a plain
+   `.rvdev-root button` selector would outrank every single-class component
+   style below and flatten their padding to nothing. */
+:where(.rvdev-root button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+:where(.rvdev-root input) {
+  font: inherit;
+}
+.rvdev-root :focus-visible {
+  outline: 2px solid var(--rvdev-select);
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+
+/* On a product route the page gives up the panel's width rather than being
+   covered by it, so responsive layouts reflow honestly. The board doesn't: its
+   canvas is a viewport you pan. */
+html.rvdev-on body {
+  margin-right: var(--rvdev-inset, 400px);
+}
+
+/* ⚠ There is deliberately NO event-catching overlay. One used to cover the
+   board while picking and it ate the wheel and pointerdown events the canvas
+   needs — ⌘-scroll fell through to the browser's own page zoom and panning
+   stopped. Picking listens in the capture phase instead (overlay.tsx), and the
+   crosshair cursor is set inline on each document being picked from, since a
+   framed document has none of these styles. */
+
+/* --- panel ---------------------------------------------------------------- */
+
+.rvdev-panel {
+  pointer-events: auto;
+  /* Above the highlight and measurement layers: the canvas runs on underneath,
+     so a selected element's outline is genuinely partly behind the panel — and
+     an outline drawn across the panel's own controls would be the tool
+     obscuring itself. */
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--rv-card);
+  border-left: 1px solid var(--rv-border);
+  box-shadow: var(--rv-shadow-xl);
+  outline: none;
+}
+.rvdev-panel.is-resizing {
+  user-select: none;
+}
+
+.rvdev-grip {
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: ew-resize;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rvdev-grip:hover {
+  background: color-mix(in oklab, var(--rvdev-select) 45%, transparent);
+}
+
+.rvdev-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 10px 10px 14px;
+}
+.rvdev-brand {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-right: auto;
+}
+
+/* Icon buttons — quiet by default, solid when armed. */
+.rvdev-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rvdev-btn:hover {
+  background: var(--rv-muted);
+  color: var(--rv-fg);
+}
+.rvdev-btn.is-on {
+  background: var(--rvdev-select);
+  color: #fff;
+}
+.rvdev-btn.is-on:hover {
+  background: color-mix(in oklab, var(--rvdev-select) 88%, #000);
+  color: #fff;
+}
+
+/* The picked element, as its own object: the one thing the whole panel is
+   about, so it gets a surface rather than a line of text. */
+.rvdev-target {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 10px 10px;
+  padding: 7px 8px 7px 10px;
+  border-radius: 10px;
+  background: var(--rv-muted);
+}
+.rvdev-target-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--rvdev-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rvdev-target-name.is-empty {
+  color: var(--rv-muted-fg);
+  font-family: inherit;
+  font-size: 12.5px;
+}
+.rvdev-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--rv-muted-fg);
+  white-space: nowrap;
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rvdev-ghost:hover {
+  background: var(--rv-card);
+  color: var(--rv-fg);
+}
+.rvdev-ghost.is-done {
+  color: var(--rvdev-select);
+}
+
+/* Tabs: a segmented control on a recessed track, the board's own idiom. */
+.rvdev-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 0 10px 4px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--rv-muted);
+}
+.rvdev-tab {
+  flex: 1;
+  height: 26px;
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease), box-shadow var(--rv-fast) var(--rv-ease);
+}
+.rvdev-tab:hover {
+  color: var(--rv-fg);
+}
+.rvdev-tab.is-on {
+  background: var(--rv-card);
+  color: var(--rv-fg);
+  font-weight: 600;
+  box-shadow: var(--rv-shadow-sm);
+}
+
+.rvdev-body {
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0 32px;
+}
+
+.rvdev-blank {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 56px 28px;
+  text-align: center;
+  color: var(--rv-muted-fg);
+}
+.rvdev-blank svg {
+  opacity: 0.4;
+}
+.rvdev-blank small {
+  font-size: 11.5px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+/* --- groups --------------------------------------------------------------- */
+/* Space, not rules. A hairline under every section made eleven rows read as a
+   form to fill in rather than a spec to read. */
+
+.rvdev-group {
+  padding: 10px 12px 4px;
+}
+.rvdev-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rv-muted-fg);
+}
+.rvdev-group h3 > :last-child:not(:first-child) {
+  margin-left: auto;
+}
+
+.rvdev-rows {
+  display: grid;
+}
+/* Label left, value right: the alignment that makes a column of numbers
+   readable, and most of why this now reads as an inspector. */
+.rvdev-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 24px;
+  padding: 3px 6px;
+  margin: 0 -6px;
+  width: calc(100% + 12px);
+  border-radius: 6px;
+  text-align: left;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+button.rvdev-row:hover {
+  background: var(--rv-muted);
+}
+.rvdev-row-key {
+  flex: 0 0 auto;
+  color: var(--rv-muted-fg);
+  font-size: 12px;
+}
+.rvdev-row-value {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-family: var(--rvdev-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.rvdev-row-value.is-copied {
+  color: var(--rvdev-select);
+}
+.rvdev-row-token {
+  color: var(--rvdev-select);
+  font-weight: 600;
+}
+
+/* --- breadcrumb ----------------------------------------------------------- */
+
+.rvdev-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+.rvdev-crumb {
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rvdev-crumb:hover {
+  background: var(--rv-muted);
+  color: var(--rv-fg);
+}
+/* The owning component — the answer to "what is this" — carries the weight. */
+.rvdev-crumb.is-own {
+  color: var(--rv-fg);
+  font-weight: 650;
+}
+.rvdev-crumb-sep {
+  color: var(--rv-muted-fg);
+  opacity: 0.45;
+  font-size: 10px;
+}
+
+/* --- swatches, tokens, icons ---------------------------------------------- */
+
+.rvdev-swatch {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+  /* Checkerboard so a transparent or translucent value reads as one. */
+  background-image: linear-gradient(45deg, #c4c4c4 25%, transparent 25%), linear-gradient(-45deg, #c4c4c4 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+.rvdev-color {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: calc(100% + 12px);
+  margin: 0 -6px;
+  padding: 5px 6px;
+  border-radius: 7px;
+  text-align: left;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rvdev-color:hover {
+  background: var(--rv-muted);
+}
+.rvdev-color-body {
+  flex: 1;
+  min-width: 0;
+}
+.rvdev-color-name {
+  display: block;
+  font-family: var(--rvdev-mono);
+  font-size: 11.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rvdev-color-sub {
+  display: block;
+  color: var(--rv-muted-fg);
+  font-size: 10.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rvdev-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 6px;
+  margin: 0 -6px;
+  border-radius: 8px;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rvdev-icon-row:hover {
+  background: var(--rv-muted);
+}
+.rvdev-icon-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.rvdev-icon-preview {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--rv-muted);
+  flex: 0 0 auto;
+}
+.rvdev-icon-row:hover .rvdev-icon-preview {
+  background: var(--rv-card);
+}
+.rvdev-icon-preview svg {
+  width: 17px;
+  height: 17px;
+}
+.rvdev-mono {
+  font-family: var(--rvdev-mono);
+  font-size: 11.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rvdev-sub {
+  color: var(--rv-muted-fg);
+  font-size: 10.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rvdev-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% + 12px);
+  margin: 0 -6px;
+  padding: 6px;
+  border-radius: 8px;
+  text-align: left;
+  transition: background var(--rv-fast) var(--rv-ease);
+}
+.rvdev-asset:hover {
+  background: var(--rv-muted);
+}
+.rvdev-asset-body {
+  flex: 1;
+  min-width: 0;
+}
+/* The picture itself, small — a path alone doesn't answer "which picture is
+   this?", which is the question the download button gets pressed to settle. */
+.rvdev-asset-thumb {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--rv-muted);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.rvdev-asset:hover .rvdev-asset-thumb {
+  background: var(--rv-card);
+}
+.rvdev-asset-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.rvdev-asset-url {
+  display: block;
+  color: var(--rvdev-select);
+  font-family: var(--rvdev-mono);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+/* Two chips side by side (icon rows, the Files header) — the h3 rule pushes
+   the last child right, so the pair travels as one. */
+.rvdev-row-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+/* --- code ----------------------------------------------------------------- */
+
+.rvdev-seg-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 0;
+}
+.rvdev-seg {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--rv-muted);
+  border-radius: 9px;
+}
+.rvdev-seg-btn {
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--rv-muted-fg);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rvdev-seg-btn:hover {
+  color: var(--rv-fg);
+}
+.rvdev-seg-btn.is-on {
+  background: var(--rv-card);
+  color: var(--rv-fg);
+  font-weight: 650;
+  box-shadow: var(--rv-shadow-sm);
+}
+.rvdev-seg-row .rvdev-copy {
+  margin-left: auto;
+}
+
+.rvdev-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px 0;
+  color: var(--rv-muted-fg);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.rvdev-pre {
+  margin: 9px 12px 0;
+  padding: 11px 12px;
+  background: var(--rv-muted);
+  border-radius: 12px;
+  font-family: var(--rvdev-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  /* pre-wrap, not pre: a Tailwind className runs to 300 characters, and in a
+     400px panel horizontal scrolling would hide most of every line. Wrapping
+     keeps the indentation (so the tree still reads) and loses nothing. */
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 2;
+}
+
+.rvdev-copy {
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 7px;
+  font-size: 11px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  color: var(--rv-muted-fg);
+  background: var(--rv-muted);
+  transition: background var(--rv-fast) var(--rv-ease), color var(--rv-fast) var(--rv-ease);
+}
+.rvdev-copy:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.rvdev-copy:hover {
+  background: var(--rv-fg);
+  color: var(--rv-card);
+}
+.rvdev-copy.is-block {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 8px 10px;
+  text-align: left;
+  margin-bottom: 5px;
+}
+.rvdev-copy.is-done {
+  background: var(--rvdev-select);
+  color: #fff;
+}
+
+.rvdev-field {
+  padding: 4px 12px 0;
+}
+.rvdev-input {
+  width: 100%;
+  background: var(--rv-card);
+  border: 1px solid var(--rv-border);
+  border-radius: 8px;
+  color: var(--rv-fg);
+  padding: 6px 9px;
+  font-size: 12px;
+  transition: border-color var(--rv-fast) var(--rv-ease), box-shadow var(--rv-fast) var(--rv-ease);
+}
+.rvdev-input::placeholder {
+  color: var(--rv-muted-fg);
+}
+.rvdev-input:focus {
+  outline: none;
+  border-color: var(--rvdev-select);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--rvdev-select) 18%, transparent);
+}
+.rvdev-input.is-sm {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--rvdev-mono);
+  font-size: 11px;
+  padding: 3px 7px;
+}
+.rvdev-param {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+}
+.rvdev-param .rvdev-row-key {
+  flex: 0 0 84px;
+}
+
+/* Download actions: the two things a developer leaves with. */
+.rvdev-action {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--rv-muted);
+  border-radius: 12px;
+  padding: 11px 12px;
+  margin-bottom: 7px;
+  transition: box-shadow var(--rv-fast) var(--rv-ease), background var(--rv-fast) var(--rv-ease);
+}
+.rvdev-action:hover:not(:disabled) {
+  background: var(--rv-card);
+  box-shadow: 0 0 0 1.5px var(--rvdev-select), var(--rv-shadow-sm);
+}
+.rvdev-action:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.rvdev-action b {
+  display: block;
+  font-family: var(--rvdev-mono);
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+.rvdev-action span {
+  color: var(--rv-muted-fg);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.rvdev-empty {
+  margin: 2px 0;
+  color: var(--rv-muted-fg);
+  font-size: 12px;
+}
+.rvdev-note {
+  margin: 10px 12px 0;
+  color: var(--rv-muted-fg);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* --- highlight, rulers, measurements -------------------------------------- */
+
+.rvdev-hl {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+}
+.rvdev-hl.is-hover {
+  outline: 1.5px solid var(--rvdev-select);
+  background: color-mix(in oklab, var(--rvdev-select) 9%, transparent);
+}
+.rvdev-hl.is-selected {
+  outline: 1.5px solid var(--rvdev-select);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--rvdev-select) 18%, transparent);
+}
+.rvdev-hl-tag {
+  position: absolute;
+  top: -21px;
+  left: -1px;
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+  background: var(--rvdev-select);
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-family: var(--rvdev-mono);
+  font-size: 10.5px;
+  line-height: 1.4;
+  box-shadow: var(--rv-shadow-sm);
+}
+.rvdev-hl-tag em {
+  font-style: normal;
+  opacity: 0.75;
+}
+
+/* a design tool's measurement ink: magenta, dashed, the number in a solid chip so it
+   stays readable over any screen. */
+.rvdev-measure {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2;
+}
+.rvdev-measure.is-x {
+  border-top: 1px dashed var(--rvdev-measure);
+}
+.rvdev-measure.is-y {
+  border-left: 1px dashed var(--rvdev-measure);
+}
+.rvdev-measure-label {
+  position: absolute;
+  background: var(--rvdev-measure);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 4px;
+  font-family: var(--rvdev-mono);
+  font-size: 9.5px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.rvdev-measure.is-x .rvdev-measure-label {
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+}
+.rvdev-measure.is-y .rvdev-measure-label {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.rvdev-ruler {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  background: color-mix(in oklab, var(--rv-card) 88%, transparent);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--rv-border);
+  border-radius: 4px;
+  color: var(--rv-muted-fg);
+  font-family: var(--rvdev-mono);
+  font-size: 9px;
+  overflow: hidden;
+}
+.rvdev-ruler.is-x {
+  height: 15px;
+}
+.rvdev-ruler.is-y {
+  width: 15px;
+}
+.rvdev-tick {
+  position: absolute;
+  opacity: 0.45;
+}
+.rvdev-ruler.is-x .rvdev-tick {
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid currentColor;
+  padding-left: 2px;
+  line-height: 13px;
+}
+.rvdev-ruler.is-y .rvdev-tick {
+  left: 0;
+  right: 0;
+  border-top: 1px solid currentColor;
+  padding-left: 2px;
+  line-height: 10px;
+}
+.rvdev-tick.is-major {
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rvdev-root *,
+  .rvdev-root *::before,
+  .rvdev-root *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

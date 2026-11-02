@@ -1,0 +1,63 @@
+{
+  "skill_name": "don-star",
+  "evals": [
+    {
+      "id": 1,
+      "name": "fresh-install",
+      "prompt": "/don-star \u2014 set up the design-review board for this app (the Vite + React app in the current directory, a meal-kit site called Northwind Meals with a home page, pricing, a three-step signup and an account page). I want every screen on it, including each step of the signup, so my teammate Pat can start leaving comments tomorrow. Get it to the point where I can run npm run dev and open the board.",
+      "expected_output": "The full harness installed into the app (src/review with admin, auth, dev, flows, the seed/capture modules, the page mounts, middleware, supabase SQL + functions, scripts, workflows), main.tsx wired with the three calls first, the routes mounted, vite.config and tsconfig patched, a review.config.tsx covering /, /pricing, /account and all three signup steps (steps 2 and 3 seeded via the app's sessionStorage key northwind-signup-v1, with Signup.tsx reading through readSession), the app type-checking and building, and a short hand-off telling the user how to comment.",
+      "files": [
+        "fixtures/app-basic"
+      ],
+      "expectations": [
+        "harness fully present: admin console, presence, share panel, folder, auth gate, dev mode, flows canvas, middleware, supabase SQL + functions, shots script",
+        "both GitHub workflows (review-shots, triage-reply) installed at the repo root",
+        "main.tsx: review-seed is the first import and applySeedFromUrl() + installReviewCapture() are called",
+        "vite.config: reviewSnapshotPlugin + screenVersionsPlugin + board-file watch ignore",
+        "review.config.tsx covers /, /pricing, /account and /signup as live url screens",
+        "signup has one screen per step (3+), steps 2\u20133 seeded via northwind-signup-v1",
+        "Signup.tsx reads its saved state through readSession (the app side of the seed contract)",
+        "app type-checks and builds (check.txt)",
+        "report tells the user how to leave a comment (C / comment tool) and where the board opens (/review)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "process-comments",
+      "prompt": "/don-star \u2014 Pat left comments on the review board for this app (Northwind Meals, board already set up, comments in review-board.json). Process them: make the changes they ask for and answer each one on the board so Pat sees what happened next time they open it.",
+      "expected_output": "Pricing.tsx changed (a 'best value' marker on Family, 'per week' after the prices) and Home.tsx changed (the Get started button moved above the tagline); both comment threads replied to in-thread via board.py as an agent author (a leading '/') with a byline and resolved; the documentation event (meta.docKind email) left untouched and unresolved; no thread deleted, existing ids and timestamps preserved; the app still builds; a short per-thread report.",
+      "files": [
+        "fixtures/app-boarded"
+      ],
+      "expectations": [
+        "Pricing.tsx now says 'per week' and marks Family as best value",
+        "Home.tsx puts the Get started button before the tagline",
+        "pricing thread replied in-thread by an agent author (leading '/') and resolved",
+        "home thread replied in-thread by an agent author and resolved",
+        "the documentation event (meta.docKind) is untouched: unresolved, no replies",
+        "no thread deleted; existing ids and timestamps preserved",
+        "a reply carries a provenance byline (meta.command / files / verified)",
+        "app still type-checks and builds",
+        "report is per-thread: names both comments and what changed"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "second-project-and-flows",
+      "prompt": "/don-star \u2014 this app already has the review board. Add two more things to it: a second board called 'Marketing site' with just the home and pricing pages on it (its own project, so its comments stay separate), and a flow-chart canvas project called 'Signup branching' where Pat and I can draw how the signup should branch. Then tell me what I'd need to do for Pat to be able to open the shared version of these once we put it on Supabase.",
+      "expected_output": "A new config module with a new pinned slug (e.g. marketing-site) listing home and pricing as live url screens; a registry entry for it and a kind: 'flows' entry for signup-branching in src/review/projects.ts; the original project untouched; the app type-checks; a note that the new project's board file is review-board-<slug>.json; and a correct explanation that on a shared board each new project needs a project_access grant (via /projects/access or an insert) and that the flows project needs one too, pointing at the SQL already in supabase/ rather than inventing schema.",
+      "files": [
+        "fixtures/app-boarded"
+      ],
+      "expectations": [
+        "a second board project with its own pinned slug and config module listing home + pricing as live screens",
+        "a kind: 'flows' project registered for the signup branching canvas",
+        "the original northwind project and its config untouched",
+        "app type-checks and builds",
+        "report explains the shared setup correctly: each new project needs a project_access grant (via /projects/access or the SQL), the flows project included",
+        "report names the new board's own file review-board-<slug>.json",
+        "report points at the SQL already in supabase/ rather than inventing schema"
+      ]
+    }
+  ]
+}
