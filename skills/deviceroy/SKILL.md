@@ -80,7 +80,10 @@ from `<SKILL>/assets/config.template.json`:
 
 Fill what you can infer from the repo first (router file, dev port, canvas config) and ask
 only about the rest. Useful extras: `web.hideSelectors` for dev overlays that shouldn't count
-as UI, `chrome` for shell files every screen renders inside, `tabRoutes` when the router
+as UI, `chrome` for shell files every screen renders inside, `screenSources` for apps with no
+file router (Swift, Flutter): each route's own files (`{"/library": ["App/LibraryView.swift"]}`),
+without which code findings can't be told apart by screen (keep `chrome` to the true shell; listing
+every file there puts every finding on every screen), `tabRoutes` when the router
 can't tell which screens are tabs, `brandExceptions` (`"RULE-ID@screen"` or `"RULE-ID@*"`)
 for deliberate brand deviations, which then show as "accepted" instead of re-flagging.
 

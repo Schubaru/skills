@@ -15,7 +15,7 @@ TAGS = [
     ("tabs.js", r"@react-navigation/bottom-tabs|createBottomTabNavigator|createMaterialBottomTabNavigator|import\s*\{[^}]*\bTabs\b[^}]*\}\s*from\s*['\"]expo-router['\"]|<Tabs[\s>]|BottomNavigationBar\(|CupertinoTabBar\(", 0),
     ("tabs.native", r"unstable-native-tabs|\bNativeTabs\b|react-native-bottom-tabs|CupertinoTabScaffold|NavigationBar\(|\bTabView\s*[({]|\bTab\(\s*\"", 0),
     ("drawer", r"createDrawerNavigator|@react-navigation/drawer|expo-router/drawer|\bDrawer\b|Bars3Icon|HamburgerIcon|line\.3\.horizontal|\bhamburger\b|Icons\.menu\b|name=[\"']menu[\"']", 0),
-    ("back.custom", r"headerLeft\s*[:=]|headerBackVisible\s*:\s*false|navigate\(\s*-1\s*\)|router\.back\(|navigation\.goBack\(|history\.back\(|aria-label=[\"'`{]+Back\b|>\s*Back\s*<|<BackButton\b|\bback=\{\{\s*to\b|label\s*:\s*['\"]Back\b", 0),
+    ("back.custom", r"headerLeft\s*[:=]|headerBackVisible\s*:\s*false|navigate\(\s*-1\s*\)|router\.back\(|navigation\.goBack\(|history\.back\(|aria-label=[\"'`{]+Back\b|>\s*Back\s*<|<BackButton\b|\bback=\{\{\s*to\b|label\s*:\s*['\"]Back\b|[\"'](?:chevron|arrow)\.(?:left|backward)[\"']|navigationBarBackButtonHidden\(", 0),
     ("back.intercept", r"BackHandler\.addEventListener|onBackPressed|usePreventRemove|['\"]beforeRemove['\"]|popstate|WillPopScope|\bPopScope\b", 0),
     ("rail", r"NavigationRail|navigation-rail|NavigationSuiteScaffold|\bRail\b|WindowSizeClass|useWindowDimensions", 0),
     # bars
@@ -98,6 +98,24 @@ def scopes(text):
     return [(ln, (marks[i + 1][0] - 1) if i + 1 < len(marks) else last, name) for i, (ln, name) in enumerate(marks)]
 
 
+PAGED = re.compile(r"\.tabViewStyle\(\s*(?:\.page|\.verticalPage|PageTabViewStyle)")
+
+
+def paged_tabview(text, lines, n):
+    """A SwiftUI TabView styled as pages is a swipeable pager (a story, a carousel), not a tab bar.
+    The style is a modifier after the TabView's closing brace, so match the brace, then read its modifier
+    chain (the rest of that line plus the lines that start with "."; ponytail: a multi-line closure
+    argument ends the chain early, so a style set after one is missed and the pager counts as tabs)."""
+    start = sum(len(l) + 1 for l in lines[: n - 1])
+    i = text.find("{", start + lines[n - 1].find("TabView")) if "TabView" in lines[n - 1] else -1
+    depth = 0
+    for j in range(i, len(text)) if i >= 0 else ():
+        depth += {"{": 1, "}": -1}.get(text[j], 0)
+        if depth == 0:
+            return bool(PAGED.search(re.match(r"[^\n]*(?:\n\s*\.[^\n]*)*", text[j + 1:]).group(0)))
+    return False
+
+
 def scan(project, files, names=None):
     """names: route names this screen answers to; a hit inside another route's declaration is dropped."""
     tags = {}
@@ -118,6 +136,8 @@ def scan(project, files, names=None):
                 if n in imports and t not in IMPORT_OK:
                     continue
                 if rx.search(line):
+                    if t == "tabs.native" and paged_tabview(text, lines, n):
+                        continue
                     tags.setdefault(t, []).append({"file": rel, "line": n, "text": line.strip()[:140]})
         # window scans (multi-line JSX)
         for m in re.finditer(r"<nav\b", text):

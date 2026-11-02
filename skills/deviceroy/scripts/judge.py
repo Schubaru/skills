@@ -44,7 +44,9 @@ def main():
         screen, platform, zone, note = a.observe
         if zone not in ("top-bar", "bottom-bar", "content", "overlay"):
             sys.exit("zone must be top-bar | bottom-bar | content | overlay")
-        obs = {"screen": screen, "platform": platform, "zone": zone, "note": note, "evidence": "W"}
+        modes = load(run / "preflight.json", {}).get("modes", [])  # what this run could actually show
+        ev = "V" if any(m.startswith("V") for m in modes) else "W" if "W" in modes else "C"
+        obs = {"screen": screen, "platform": platform, "zone": zone, "note": note, "evidence": ev}
         if obs not in j["observations"]:
             j["observations"].append(obs)
             j["observations"].sort(key=lambda o: (o["screen"], o["note"]))

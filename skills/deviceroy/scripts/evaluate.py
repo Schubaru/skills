@@ -79,8 +79,9 @@ def loc(hits, n=3):
 
 # ---------------------------------------------------------------- screen context
 class Screen:
-    def __init__(self, s, static, docs):
+    def __init__(self, s, static, docs, stack):
         self.s = s
+        self.stack = stack
         self.slug = s["slug"]
         st = static.get(self.slug, {})
         self.tags = {}
@@ -157,6 +158,8 @@ def ev_custom_tabs(sc, rule, p):
     if not sc.has_code:
         return None
     hits = sc.t("tabs.js", "tabs.custom")
+    if not hits and not sc.t("tabs.native") and sc.stack == "swift":
+        return None  # a hand-built SwiftUI tab bar is plain stacks of buttons: code can't tell it from no tab bar
     if not hits or sc.t("tabs.native"):
         return []
     kind = "JS tab bar" if sc.t("tabs.js") else "custom bottom <nav>"
@@ -337,6 +340,8 @@ def ev_sheet(sc, rule, p):
     if not sc.has_code:
         return None
     hits = sc.t("sheet.custom")
+    if not hits and sc.stack == "swift":
+        return None  # a hand-built SwiftUI sheet is an offset view with a drag gesture: code can't tell it apart
     if not hits or sc.t("sheet.native"):
         return []
     extra = "" if rule["id"] != "AND-SHT-01" else (" A drag handle is drawn." if sc.t("sheet.handle") else " No drag handle found.")
@@ -661,7 +666,7 @@ def main(run_dir):
             d = load(run / "elements" / f"{s['slug']}__{p}__{appearance}.json")
             if d:
                 docs[p] = Doc(d)
-        screens.append(Screen(s, static, docs))
+        screens.append(Screen(s, static, docs, stack))
     available = {"C"} | {d.ev for sc in screens for d in sc.docs.values()}
 
     cands, appendix = [], {"evaluated": [], "passed": [], "skipped": [], "notApplicable": []}
@@ -758,7 +763,8 @@ def main(run_dir):
             findings[c["screen"]].append(item)
     for o in jfile.get("observations", []):
         manual.append({"findingId": f"OBS__{o['screen']}__{hash4(o['note'])}", "ruleId": None, "title": "Observation (no matching rule)",
-                       "screen": o["screen"], "platform": o.get("platform", "both"), "severity": None, "evidence": o.get("evidence", "W"),
+                       "screen": o["screen"], "platform": o.get("platform", "both"), "severity": None,
+                       "evidence": o["evidence"] if o.get("evidence") in available else "C",  # never claim a render this run didn't have
                        "element": {"label": "", "testID": "", "bbox": None, "zone": o.get("zone", "content")}, "current": o["note"],
                        "locations": [], "status": "observation", "question": ""})
 

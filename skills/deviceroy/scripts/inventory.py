@@ -187,12 +187,14 @@ def main(run_dir):
         screens = {k: v for k, v in screens.items() if any(k == p or k.startswith(p.rstrip("/") + "/") for p in include)}
 
     chrome_cfg = [project / c for c in cfg.get("chrome", [])]
+    # Apps with no file router (Swift, Flutter) map files to screens in config: {"/library": ["App/LibraryView.swift"]}
+    mapped = {k: [project / f for f in v] for k, v in (cfg.get("screenSources") or {}).items()}
     ignored = {(project / i).resolve() for i in cfg.get("ignoreSources", [])}
     tab_cfg = set(cfg.get("tabRoutes", []))
     out = []
     for key, s in screens.items():
         r = routes.get(key, {"files": [], "chrome": [], "tab": False})
-        files = list(dict.fromkeys(r["files"]))
+        files = list(dict.fromkeys(r["files"] + mapped.get(key, [])))
         deps = []
         for f in files:
             deps += local_imports(f, project)
