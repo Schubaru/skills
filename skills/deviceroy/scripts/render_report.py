@@ -433,7 +433,7 @@ class Page:
                    f"<div>{pill('P1')}<b>{totals['P1']}</b><span class=\"muted small\">Breaks what {PHONE[p]} users expect, or blocks some people.</span></div>"
                    f"<div>{pill('P2')}<b>{totals['P2']}</b><span class=\"muted small\">Easy to notice, but doesn't block anyone.</span></div>"
                    f"<div>{pill('P3')}<b>{totals['P3']}</b><span class=\"muted small\">Small polish.</span></div></div>")
-        lead = f"{total} problems in all. Problems that come from a shared part, like the tab bar, are counted once." if total else "No problems found."
+        lead = f"{total} problem{'' if total == 1 else 's'} in all. Problems that come from a shared part, like the tab bar, are counted once." if total else "No problems found."
         if total:
             summary += (f"<div class=\"tw\"><table><thead><tr><th>Level</th><th>Problem</th><th class=\"n\">Screens</th></tr></thead><tbody>{common_rows}</tbody></table></div>")
         if n_manual:
