@@ -1,0 +1,175 @@
+{
+  "output_template_id": "ui_change_checklist",
+  "dimensions": [
+    {
+      "id": "focus_on_ui_work",
+      "name": "Focus on UI work",
+      "definition": "The checklist stays centered on the front-end cosmetic changes and does not drift into broader implementation details.",
+      "why_it_matters": "You want it to focus on the specific UI changes and nothing else when asked to accomplish a task.",
+      "bad_example": "The checklist starts describing general implementation work, backend changes, or broad project status instead of the UI updates that were made.",
+      "good_example": "The checklist names the UI changes and keeps the summary tightly scoped to the front-end work.",
+      "better_example": "The checklist reads like a clean change log for the visual edits and avoids unrelated implementation details.",
+      "best_example": "The checklist only describes the exact cosmetic UI changes that were made, with no drift into broader code or project discussion.",
+      "anchors": [
+        {
+          "level": "bad",
+          "description": "The checklist starts describing general implementation work, backend changes, or broad project status instead of the UI updates that were made."
+        },
+        {
+          "level": "good",
+          "description": "The checklist names the UI changes and keeps the summary tightly scoped to the front-end work."
+        },
+        {
+          "level": "better",
+          "description": "The checklist reads like a clean change log for the visual edits and avoids unrelated implementation details."
+        },
+        {
+          "level": "best",
+          "description": "The checklist only describes the exact cosmetic UI changes that were made, with no drift into broader code or project discussion."
+        }
+      ],
+      "weight": {
+        "kind": "qualitative",
+        "qualitative_label": "average",
+        "normalized": 0.5
+      },
+      "must_have": false
+    },
+    {
+      "id": "clear_project_or_screen",
+      "name": "Clear project or screen reference",
+      "definition": "The checklist identifies the project or screen clearly enough that the change can be tracked later without confusion.",
+      "why_it_matters": "The change needs to be tied to the right work so the reviewer can file and find it easily.",
+      "bad_example": "The checklist leaves out the project or screen entirely, so it is hard to tell what the change belongs to.",
+      "good_example": "The checklist names the project or screen in a way that makes the change easy to track.",
+      "better_example": "The checklist gives enough context to show exactly where the UI change belongs.",
+      "best_example": "The checklist makes the work easy to trace later because the project or screen is clear right away.",
+      "anchors": [
+        {
+          "level": "bad",
+          "description": "The checklist leaves out the project or screen entirely, so it is hard to tell what the change belongs to."
+        },
+        {
+          "level": "good",
+          "description": "The checklist names the project or screen in a way that makes the change easy to track."
+        },
+        {
+          "level": "better",
+          "description": "The checklist gives enough context to show exactly where the UI change belongs."
+        },
+        {
+          "level": "best",
+          "description": "The checklist makes the work easy to trace later because the project or screen is clear right away."
+        }
+      ],
+      "weight": {
+        "kind": "qualitative",
+        "qualitative_label": "average",
+        "normalized": 0.5
+      },
+      "must_have": false
+    },
+    {
+      "id": "specific_change_items",
+      "name": "Specific change items",
+      "definition": "Each checklist item says exactly what was changed so a reviewer can tell what actually happened.",
+      "why_it_matters": "If the items are too broad, I can’t tell what was actually done.",
+      "bad_example": "The checklist items are so vague or generic that they could apply to any project and do not show what changed.",
+      "good_example": "The checklist items clearly describe the UI edits that were completed.",
+      "better_example": "The checklist items are specific enough that a reviewer can tell what was updated without guessing.",
+      "best_example": "Each checklist item reads like a faithful record of the front-end work and makes the exact UI changes obvious at a glance.",
+      "anchors": [
+        {
+          "level": "bad",
+          "description": "The checklist items are so vague or generic that they could apply to any project and do not show what changed."
+        },
+        {
+          "level": "good",
+          "description": "The checklist items clearly describe the UI edits that were completed."
+        },
+        {
+          "level": "better",
+          "description": "The checklist items are specific enough that a reviewer can tell what was updated without guessing."
+        },
+        {
+          "level": "best",
+          "description": "Each checklist item reads like a faithful record of the front-end work and makes the exact UI changes obvious at a glance."
+        }
+      ],
+      "weight": {
+        "kind": "qualitative",
+        "qualitative_label": "average",
+        "normalized": 0.5
+      },
+      "must_have": false
+    },
+    {
+      "id": "review_context_and_caveats",
+      "name": "Review context and caveats",
+      "definition": "The checklist calls out the important context, constraints, or follow-up notes a reviewer needs to assess the change safely.",
+      "why_it_matters": "It should include anything important I should know for review.",
+      "bad_example": "The checklist skips the caveats or follow-up notes that a reviewer would need to judge the change safely.",
+      "good_example": "The checklist calls out the key context or constraints that matter for review.",
+      "better_example": "The checklist includes the important caveats and follow-up notes without turning into a long explanation.",
+      "best_example": "The checklist surfaces the exact context a reviewer needs so they can approve the change without hunting for missing details.",
+      "anchors": [
+        {
+          "level": "bad",
+          "description": "The checklist skips the caveats or follow-up notes that a reviewer would need to judge the change safely."
+        },
+        {
+          "level": "good",
+          "description": "The checklist calls out the key context or constraints that matter for review."
+        },
+        {
+          "level": "better",
+          "description": "The checklist includes the important caveats and follow-up notes without turning into a long explanation."
+        },
+        {
+          "level": "best",
+          "description": "The checklist surfaces the exact context a reviewer needs so they can approve the change without hunting for missing details."
+        }
+      ],
+      "weight": {
+        "kind": "qualitative",
+        "qualitative_label": "average",
+        "normalized": 0.5
+      },
+      "must_have": true
+    },
+    {
+      "id": "clear_follow_up_step",
+      "name": "Clear follow-up step",
+      "definition": "The checklist ends with an obvious next step for reviewing or checking the result.",
+      "why_it_matters": "The reviewer should have a clear next step for checking the result.",
+      "bad_example": "The checklist ends without telling the reviewer what to check next or how to confirm the change.",
+      "good_example": "The checklist gives a simple next step for reviewing the updated UI.",
+      "better_example": "The checklist points the reviewer to the most relevant place or view to verify the change.",
+      "best_example": "The checklist ends with a clear review step that makes it easy to confirm the UI change right away.",
+      "anchors": [
+        {
+          "level": "bad",
+          "description": "The checklist ends without telling the reviewer what to check next or how to confirm the change."
+        },
+        {
+          "level": "good",
+          "description": "The checklist gives a simple next step for reviewing the updated UI."
+        },
+        {
+          "level": "better",
+          "description": "The checklist points the reviewer to the most relevant place or view to verify the change."
+        },
+        {
+          "level": "best",
+          "description": "The checklist ends with a clear review step that makes it easy to confirm the UI change right away."
+        }
+      ],
+      "weight": {
+        "kind": "qualitative",
+        "qualitative_label": "average",
+        "normalized": 0.5
+      },
+      "must_have": false
+    }
+  ]
+}

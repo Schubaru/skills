@@ -6,19 +6,20 @@ Claude Code skills I use every day, packaged so you can too. Each one is a folde
 |---|---|
 | [don-star](skills/don-star) | A review canvas of live screens inside your Vite + React app, with pinned comments an agent turns into code. |
 | [deviceroy](skills/deviceroy) | Screen-by-screen iOS 27 vs Android 17 platform audit, published as plain-language report pages. |
-| [norm-dog](skills/norm-dog) | Don Norman's *Design of Everyday Things*, run against your screens: audit, shape, harden, polish. |
+| [ui-surgeon](skills/ui-surgeon) | A short, reviewable checklist of the UI changes you just made, ready to hand off. |
 | [key-components](skills/key-components) | Builds or reverse-engineers a complete design system: tokens, components, stories, docs. |
 | [test-mite](skills/test-mite) | Deterministic routing tests: Playwright coverage of every route, plus a findings report. |
 | [app-store](skills/app-store) | Audits an iOS app against Apple's current review guidelines, fixes what it safely can, reports the rest. |
 | [noob-inc](skills/noob-inc) | Deploys N00B Inc into your own accounts: a pixel office and board for your Claude Code agents, with an inbox for their permission prompts. |
 | [last-push](skills/last-push) | Your latest git push as a short, Slack-ready bullet list. |
+| [next-steps](skills/next-steps) | Reads your Granola meeting notes, sorts who owes what, ranks your steps, and writes a prompt for the first one. |
 
 ## Install
 
 One skill:
 
 ```bash
-npx skills add Schubaru/skills --skill norm-dog
+npx skills add Schubaru/skills --skill ui-surgeon
 ```
 
 All of them:
@@ -30,12 +31,12 @@ npx skills add Schubaru/skills --all
 As a Claude Code plugin (2.1.275 or later):
 
 ```
-/plugin install norm-dog --marketplace Schubaru/skills
+/plugin install ui-surgeon --marketplace Schubaru/skills
 ```
 
-On older versions, add the marketplace first: `/plugin marketplace add Schubaru/skills`, then `/plugin install norm-dog@doodleshoe`.
+On older versions, add the marketplace first: `/plugin marketplace add Schubaru/skills`, then `/plugin install ui-surgeon@doodleshoe`.
 
-Plugin skills are namespaced, so that one runs as `/norm-dog:norm-dog`. The `npx` route installs it as plain `/norm-dog`.
+Plugin skills are namespaced, so that one runs as `/ui-surgeon:ui-surgeon`. The `npx` route installs it as plain `/ui-surgeon`.
 
 Or copy a folder into `~/.claude/skills/` yourself.
 

@@ -28,12 +28,12 @@
       ]
     },
     {
-      "name": "norm-dog",
-      "description": "Don Norman's Design of Everyday Things, run against your screens: audit, shape, harden, polish.",
+      "name": "ui-surgeon",
+      "description": "A short, reviewable checklist of the UI changes you just made, ready to hand off.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/norm-dog"
+        "./skills/ui-surgeon"
       ]
     },
     {
@@ -79,6 +79,15 @@
       "strict": false,
       "skills": [
         "./skills/last-push"
+      ]
+    },
+    {
+      "name": "next-steps",
+      "description": "Reads your Granola meeting notes, sorts who owes what, ranks your steps, and writes a prompt for the first one.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/next-steps"
       ]
     }
   ]

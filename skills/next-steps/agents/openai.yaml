@@ -1,0 +1,7 @@
+interface:
+  display_name: Next Steps
+  short_description: Granola notes to ranked next steps and a ready-to-run prompt
+  default_prompt: |
+    What's next from my last meeting?
+policy:
+  allow_implicit_invocation: true
