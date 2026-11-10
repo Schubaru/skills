@@ -1,0 +1,380 @@
+{
+  "_about": "Plain-language copy for the report pages (render_report.py). Written for a tenth-grade reader: short sentences, no code names, no file paths. Every rule in rules.json needs an entry here. title = the problem as a person would say it; why = why it matters on the phone; fix = what to do; passed = the rule stated as something that already works; ask = the question a person answers when the rule needs a human check. after = what the After frame of the Prototype tab shows once the fix is applied (one string, or one per platform); hidden = why a listed problem has no After on a screen. Every rule with a patch in capture_after.mjs needs an after. prototype = every other word on the Prototype tab.",
+  "rules": {
+    "IOS-NAV-01": {
+      "title": "The tab bar is custom-built",
+      "why": "iPhone users expect the standard tab bar. The built-in one floats over the page with a glass look, shrinks as you scroll, and works with VoiceOver without extra work.",
+      "fix": "Use the system tab bar.",
+      "passed": "The app uses the system tab bar",
+      "after": "The tab bar becomes iPhone's floating glass bar, with a label under every icon. A web page can only hint at the glass.",
+      "hidden": "No tab bar shows on this screen as captured."
+    },
+    "IOS-NAV-02": {
+      "title": "The tab bar has too many tabs, or a tab acts like a button",
+      "why": "iPhone tab bars hold up to 5 places to go. A tab that does an action instead, like opening a form, surprises people.",
+      "fix": "Keep 5 tabs or fewer, and move actions out of the tab bar.",
+      "passed": "The tab bar has 5 tabs or fewer, and no tab acts as a button"
+    },
+    "IOS-NAV-03": {
+      "title": "Search sits in the page, not where iPhone puts it",
+      "why": "When search is a main task, iOS 27 gives it its own tab or puts it in the top bar. That is where people look for it.",
+      "fix": "Give search its own tab, or put it in the top bar.",
+      "passed": "Search sits where iPhone users look for it",
+      "ask": "Is searching a main task on this screen? If it is, iPhone expects search in its own tab or in the top bar."
+    },
+    "IOS-NAV-04": {
+      "title": "A hamburger menu is the main way to get around",
+      "why": "iPhone users expect a tab bar at the bottom. A hidden side menu makes the main places harder to find.",
+      "fix": "Use a tab bar for the main places in the app.",
+      "passed": "No hamburger menu is used as the main navigation"
+    },
+    "IOS-NAV-05": {
+      "title": "The back button is custom-built",
+      "why": "The standard back button also lets people swipe from the left edge to go back, or press and hold to jump back further. A custom button loses both.",
+      "fix": "Use the system back button in the top bar.",
+      "passed": "Screens use the system back button",
+      "after": "The custom back button becomes a plain chevron in its own glass circle, the way iPhone draws it.",
+      "hidden": "No back button shows on this screen as captured."
+    },
+    "IOS-BAR-01": {
+      "title": "The top bar has a solid background",
+      "why": "On iOS 27, the page scrolls under a see-through top bar and the system softly fades the edge. A solid bar blocks that.",
+      "fix": "Make the top bar see-through and let the page scroll under it.",
+      "passed": "Top bars let the page scroll under them",
+      "hidden": "This only shows when the page scrolls under the top bar."
+    },
+    "IOS-BAR-02": {
+      "title": "The top bar has too many buttons",
+      "why": "More than 3 buttons in the top bar crowd it and make each one harder to hit.",
+      "fix": "Keep 3 buttons or fewer, and move the rest into a “more” menu.",
+      "passed": "Top bars show 3 buttons or fewer"
+    },
+    "IOS-BAR-03": {
+      "title": "The “…” button does only one thing",
+      "why": "On iPhone, “…” means “more options.” People expect a short list, not a new page.",
+      "fix": "Give the button its own icon or a word, like “Details.”",
+      "passed": "The “…” button is only used for more options",
+      "ask": "Does the “…” button open a list of more options, or does it do just one thing?"
+    },
+    "IOS-GLS-01": {
+      "title": "Glass is stacked on top of glass",
+      "why": "Two see-through layers on top of each other make text and icons hard to read.",
+      "fix": "Keep one glass layer. Make the inner part solid.",
+      "passed": "Glass is never stacked on top of glass"
+    },
+    "IOS-GLS-02": {
+      "title": "Cards or rows use a glass look",
+      "why": "On iPhone, glass is for bars and controls that float over the page. On cards and rows it makes the page busy and harder to read.",
+      "fix": "Give cards and rows a solid background.",
+      "passed": "Glass is used on bars and controls, not on cards",
+      "ask": "Is the blurred surface a bar or control that floats over the page, or a card or row in the page?"
+    },
+    "IOS-GLS-03": {
+      "title": "Text on see-through surfaces is hard to read",
+      "why": "Some people make glass clearer, and some turn transparency off. Text has to stay readable in both cases.",
+      "fix": "Check text on glass at every glass setting and fix any that fades.",
+      "passed": "Text on see-through surfaces stays readable"
+    },
+    "IOS-MNU-01": {
+      "title": "Main actions are hidden in a menu",
+      "why": "People shouldn't have to open a menu to do the main thing on a screen.",
+      "fix": "Show main actions as buttons. Keep menus for less-used actions.",
+      "passed": "Main actions are not hidden inside menus",
+      "ask": "Does the menu button in the top bar hide something people need to do often on this screen?"
+    },
+    "IOS-MNU-02": {
+      "title": "A menu has fewer than 3 items",
+      "why": "A menu with one or two items adds a tap for no reason.",
+      "fix": "Show one or two actions as buttons instead of a menu.",
+      "passed": "Menus have at least 3 items"
+    },
+    "IOS-MNU-03": {
+      "title": "Menus are custom-built",
+      "why": "iPhone's built-in menus grow out of the button you tapped, use the glass look, give a small vibration and work with VoiceOver.",
+      "fix": "Use the system menu.",
+      "passed": "Menus use the system menu",
+      "hidden": "The menu is closed in this view, so there is nothing to show."
+    },
+    "IOS-MNU-04": {
+      "title": "Pick-one choices don't show which one is picked",
+      "why": "When people choose one option, like a sort order, they need to see which one is on.",
+      "fix": "Show a checkmark next to the current choice.",
+      "passed": "Pick-one controls show which option is picked"
+    },
+    "IOS-MNU-05": {
+      "title": "Some actions are only in a press-and-hold menu",
+      "why": "Many people never press and hold. An action that only lives there is hidden from them.",
+      "fix": "Put every press-and-hold action somewhere on screen too.",
+      "passed": "Nothing can be reached only by press-and-hold",
+      "ask": "Can everything in the press-and-hold menu also be done from a button on screen?"
+    },
+    "IOS-MNU-06": {
+      "title": "An action that ends something has no warning and isn't red",
+      "why": "Actions that end or delete something should be red and ask “Are you sure?” first, so nobody taps them by accident.",
+      "fix": "Show the action in red and confirm it with a short dialog.",
+      "passed": "Actions that end or delete something are red and ask first",
+      "ask": "Is this action red, and does it ask “Are you sure?” before it ends or deletes something?",
+      "hidden": "The menu is closed in this view, so there is nothing to show."
+    },
+    "IOS-SHT-01": {
+      "title": "Pop-up panels are custom-built",
+      "why": "iPhone's built-in sheets open to half or full height, can be dragged, and get the new glass look. Custom panels miss all of this.",
+      "fix": "Use a system sheet that opens to medium or large height.",
+      "passed": "Pop-up panels use the system sheet",
+      "after": "The panel sits in from the screen edges, with rounder corners and a grabber, like an iPhone sheet.",
+      "hidden": "The pop-up panels are closed in this view, so there is nothing to show."
+    },
+    "IOS-LAY-01": {
+      "title": "Buttons sit under the notch or the home bar",
+      "why": "The top and bottom edges of the iPhone are covered by the camera area and the home bar. Buttons there are hard or impossible to tap.",
+      "fix": "Keep buttons inside the safe area. Only backgrounds should reach the edges.",
+      "passed": "Buttons stay clear of the notch and the home bar",
+      "ask": "On a real iPhone, do any buttons sit under the camera area at the top or the home bar at the bottom?"
+    },
+    "IOS-TYP-01": {
+      "title": "Text doesn't grow with the iPhone's text size setting",
+      "why": "Many people turn up the text size in Settings. Text set to a fixed size stays small for them.",
+      "fix": "Use Apple's text styles, like Body and Headline, so text follows the person's setting.",
+      "passed": "Text grows with the iPhone's text size setting",
+      "hidden": "Text that grows with the reader's size setting can't be shown in one picture."
+    },
+    "IOS-ICN-01": {
+      "title": "Bar icons aren't Apple's SF Symbols",
+      "why": "SF Symbols match the system's text weight and size, so bars that use them look native.",
+      "fix": "Use SF Symbols for icons in the tab bar, top bar and menus.",
+      "passed": "Bar icons use Apple's SF Symbols",
+      "hidden": "SF Symbols are Apple's own icons, so a web mock-up can't draw them."
+    },
+    "IOS-TGT-01": {
+      "title": "Some buttons are too small to tap easily",
+      "why": "Apple asks for tap areas of at least 44 by 44 points. Smaller ones are easy to miss, especially for people with large fingers or shaky hands.",
+      "fix": "Make each tap area at least 44 by 44 points. The icon can stay small; only the area you can tap needs to grow.",
+      "passed": "Every button is at least 44 by 44 points",
+      "after": "Dashed boxes show each tap area grown to at least 44 by 44 points where there is room."
+    },
+    "AND-NAV-01": {
+      "title": "The navigation bar is custom-built",
+      "why": "Android users expect the standard navigation bar, with a pill that shows where you are. A custom bar looks and behaves differently from every other app.",
+      "fix": "Use the Material navigation bar with 3 to 5 places.",
+      "passed": "The app uses the Material navigation bar",
+      "after": "The tab bar becomes Android's navigation bar. It runs edge to edge, every tab has a label, and a pill sits behind the current tab.",
+      "hidden": "No tab bar shows on this screen as captured."
+    },
+    "AND-NAV-02": {
+      "title": "The navigation bar is the older, taller kind",
+      "why": "Android replaced the tall bottom bar with a shorter one that leaves more room for the page.",
+      "fix": "Use the shorter bar, 64 dp tall.",
+      "passed": "The navigation bar is the newer, shorter kind",
+      "after": "The bar is now the shorter 64 dp navigation bar.",
+      "hidden": "No tab bar shows on this screen as captured."
+    },
+    "AND-NAV-03": {
+      "title": "Tablets and foldables get the phone layout",
+      "why": "On wide screens, Android expects a side rail and a layout that uses the extra room. Android 17 no longer lets apps opt out of resizing.",
+      "fix": "At 600 dp and wider, swap the bottom bar for a side rail and widen the layout.",
+      "passed": "Wide screens get a side rail and a wider layout"
+    },
+    "AND-NAV-04": {
+      "title": "The back button is custom-built",
+      "why": "Android has its own back gesture with a preview of where you'll land. A custom back button, or code that blocks back, breaks it.",
+      "fix": "Rely on the system back gesture. If the top bar shows a back arrow, use the Material arrow, not a chevron or the word “Back.”",
+      "passed": "Screens use the system back gesture and arrow",
+      "after": "The custom back button becomes Android's standard back arrow at the start of the top bar.",
+      "hidden": "No back button shows on this screen as captured."
+    },
+    "AND-NAV-05": {
+      "title": "A hamburger menu is the main way to get around",
+      "why": "Android no longer uses a side drawer as the main navigation on phones. People expect a bar at the bottom.",
+      "fix": "Use the navigation bar, and a side rail on wide screens.",
+      "passed": "No hamburger menu is used as the main navigation"
+    },
+    "AND-BAR-01": {
+      "title": "The top bar has too many buttons",
+      "why": "More than 3 icons in the top bar crowd it and make each one harder to hit.",
+      "fix": "Show 3 icons or fewer, and move the rest into a ⋮ menu.",
+      "passed": "Top bars show 3 icons or fewer"
+    },
+    "AND-BAR-02": {
+      "title": "The top bar uses iPhone-style word buttons",
+      "why": "Android top bars use icons, like a check or an X, instead of words like Edit, Done or Cancel.",
+      "fix": "Use icon buttons in the top bar, or a button in the page.",
+      "passed": "Top bars use icons, not iPhone-style word buttons"
+    },
+    "AND-EDG-01": {
+      "title": "The app doesn't reach the edges of the screen",
+      "why": "Android 16 and later draw every app behind the status bar and the gesture bar. The app has to pad its content so nothing hides under them.",
+      "fix": "Draw to the edges and pad content by the system bar sizes.",
+      "passed": "The app reaches the screen edges and pads for the system bars"
+    },
+    "AND-MNU-01": {
+      "title": "An iPhone-style action sheet shows on Android",
+      "why": "Android shows choices in a menu next to the button, or in a bottom sheet with a drag handle. An iPhone action sheet looks out of place.",
+      "fix": "Use a Material menu or a bottom sheet on Android.",
+      "passed": "Choices use Android menus or bottom sheets",
+      "hidden": "The menu is closed in this view, so there is nothing to show."
+    },
+    "AND-MNU-02": {
+      "title": "Menus are custom-built",
+      "why": "The standard Android menu has rounded corners, groups, selection marks and its own motion. A custom menu misses these.",
+      "fix": "Use the Material menu.",
+      "passed": "Menus use the Material menu",
+      "hidden": "The menu is closed in this view, so there is nothing to show."
+    },
+    "AND-MNU-03": {
+      "title": "The “more” button uses a sideways “…”",
+      "why": "On Android, “more options” is three dots stacked up and down (⋮). The sideways dots are the iPhone version.",
+      "fix": "Use the ⋮ icon on Android.",
+      "passed": "The “more” button uses Android's ⋮ icon",
+      "after": "The sideways “…” becomes Android's upright ⋮.",
+      "hidden": "No “…” button shows on this screen in this state."
+    },
+    "AND-MNU-04": {
+      "title": "Pick-one choices don't show which one is picked",
+      "why": "When people choose one option, like a sort order, they need to see which one is on.",
+      "fix": "Show a check or a radio button next to the current choice.",
+      "passed": "Pick-one controls show which option is picked"
+    },
+    "AND-MNU-05": {
+      "title": "The main “add” action has no floating button",
+      "why": "When adding something is the main job of a screen, Android puts it in a floating button near the bottom, where the thumb is.",
+      "fix": "Put the add action in a floating button, or a floating button with a short menu.",
+      "passed": "Screens where adding is the main job have a floating add button",
+      "ask": "Is adding something the main job of this screen? If it is, Android expects a floating add button.",
+      "after": "The add action moves out of the page and becomes a floating button near the bottom.",
+      "hidden": "The add action isn't visible in this view."
+    },
+    "AND-SRC-01": {
+      "title": "Search is a plain box in the page",
+      "why": "When search is a main task, Android uses a search bar at the top: a thick pill with the menu icon and your picture outside it.",
+      "fix": "Use the Material search bar at the top of the screen.",
+      "passed": "Search uses the Material search bar",
+      "ask": "Is searching a main task on this screen? If it is, Android expects the Material search bar at the top.",
+      "after": "Search moves out of the page and becomes the search bar at the top. The title or logo gives up its spot on this screen.",
+      "hidden": "No search field shows on this screen as captured."
+    },
+    "AND-DYN-01": {
+      "title": "The bars don't pick up the phone's colors",
+      "why": "Android can tint apps from the person's wallpaper. Keeping your brand colors is fine; this is only something to consider.",
+      "fix": "Think about tinting the bars from the phone's colors. Keeping brand colors is a valid choice.",
+      "passed": "The bars pick up the phone's colors, or keep brand colors on purpose"
+    },
+    "AND-ICN-01": {
+      "title": "Icons use Apple's style on Android",
+      "why": "Android has its own icon set, Material Symbols. Apple's icons look out of place there.",
+      "fix": "Use Material Symbols on Android.",
+      "passed": "Android icons use Material Symbols",
+      "after": "The icons in the bars switch to Material Symbols.",
+      "hidden": "No tab bar or top bar icons show on this screen as captured."
+    },
+    "AND-CTL-01": {
+      "title": "iPhone-style controls show on Android",
+      "why": "Switches, segmented controls and scrolling pickers look different on Android. The iPhone versions feel foreign there.",
+      "fix": "Use Material controls on Android: the Material switch, button groups, and menus or dialogs instead of scrolling wheels.",
+      "passed": "Controls use the Android versions",
+      "after": "The switch takes Android's shape: a wider track, and a thumb with a check when it is on.",
+      "hidden": "No switch shows in this view. Other controls, like segmented buttons, are not drawn yet."
+    },
+    "AND-SHT-01": {
+      "title": "Pop-up panels are custom-built",
+      "why": "Android's standard bottom sheet has a drag handle and familiar motion. Custom panels miss these.",
+      "fix": "Use the Material bottom sheet with a drag handle.",
+      "passed": "Pop-up panels use the Material bottom sheet",
+      "after": "The panel takes Android's sheet shape: rounder top corners and the standard drag handle.",
+      "hidden": "The pop-up panels are closed in this view, so there is nothing to show."
+    },
+    "AND-TGT-01": {
+      "title": "Some buttons are too small to tap easily",
+      "why": "Android asks for tap areas of at least 48 by 48 dp. Smaller ones are easy to miss, especially for people with large fingers or shaky hands.",
+      "fix": "Make each tap area at least 48 by 48 dp. The icon can stay small; only the area you can tap needs to grow.",
+      "passed": "Every button is at least 48 by 48 dp",
+      "after": "Top bar buttons are now 48 dp wide and small buttons grow to 40 dp tall. Dashed boxes show each new tap area."
+    },
+    "X-PAR-01": {
+      "title": "iPhone and Android get the same custom tab bar",
+      "why": "Neither phone gets the navigation its users already know.",
+      "fix": "Share the screens' content, but give each platform its own native navigation.",
+      "passed": "Each platform gets its own native navigation",
+      "after": {"ios": "iPhone gets a tab bar of its own here. Android would get a separate one built for Android.", "android": "Android gets a navigation bar of its own here. iPhone would get a separate one built for iPhone."},
+      "hidden": "No tab bar shows on this screen as captured."
+    },
+    "X-PAR-02": {
+      "title": "Navigation parts are the same on iPhone and Android",
+      "why": "iPhone and Android handle tabs, sheets and menus differently. One shared version fits neither well.",
+      "fix": "Give navigation and menus an iPhone version and an Android version.",
+      "passed": "Navigation and menus have a version for each platform",
+      "after": {"ios": "You can see this in the new tab bar. The pop-up panels stay closed in this view.", "android": "You can see this in the new navigation bar. The pop-up panels stay closed in this view."},
+      "hidden": "This is about the tab bar and pop-up panels. Neither shows on this screen as captured."
+    },
+    "X-PAR-03": {
+      "title": "An action exists on one phone but not the other",
+      "why": "People on both phones need to be able to do the same things, even if the button sits in a different place.",
+      "fix": "Make every action available on both platforms.",
+      "passed": "The same actions are available on both phones"
+    },
+    "X-PAR-04": {
+      "title": "Both platforms use the same icon set",
+      "why": "iPhone uses SF Symbols and Android uses Material Symbols. One shared set looks a little off on both.",
+      "fix": "Use SF Symbols on iPhone and Material Symbols on Android.",
+      "passed": "Each platform uses its own icon set",
+      "after": {"android": "The icons in the top bar and navigation bar switch to Material Symbols."},
+      "hidden": {"ios": "SF Symbols are Apple's own icons, so a web mock-up can't draw them.", "android": "No tab bar or top bar icons show on this screen as captured."}
+    },
+    "X-PAR-05": {
+      "title": "Confirmations use a custom pop-up",
+      "why": "The phone's own alert already has the right look, focus handling and screen reader support.",
+      "fix": "Use the native alert or dialog for confirmations.",
+      "passed": "Alerts and confirmations use native dialogs"
+    }
+  },
+  "menu": {
+    "destinations": {"name": "Main navigation", "ios": "A floating glass tab bar with up to 5 tabs. Search can have its own tab.", "android": "A navigation bar with 3 to 5 places and a pill for the current one. A side rail on wide screens."},
+    "secondary": {"name": "Other buttons on the screen", "ios": "Buttons in the top bar, grouped on glass. Less-used ones go in a “more” menu.", "android": "Up to 3 icons in the top bar, with a ⋮ menu for the rest."},
+    "overflow": {"name": "More options", "ios": "Use “…” only to open a list of more options.", "android": "A ⋮ button that opens a Material menu."},
+    "per-item": {"name": "Actions on one item", "ios": "Press and hold an item for a menu. The same actions also appear on screen.", "android": "A visible icon on the item that opens a menu. Press and hold selects items."},
+    "choose-one": {"name": "Pick one option", "ios": "A button that shows the current choice and opens a list with a checkmark.", "android": "A menu with a check on the current choice, or a row of 2 to 5 buttons."},
+    "create": {"name": "Add something new", "ios": "A “+” button. It opens a short menu if there are 3 or more things to add.", "android": "A floating add button, with a short menu if there are 2 to 6 things to add."},
+    "destructive": {"name": "Ending or deleting something", "ios": "Red text, plus a dialog that asks you to confirm.", "android": "A dialog that asks you to confirm, with the action set apart in its own group."},
+    "rich": {"name": "Panels with lots of options", "ios": "A system sheet that opens to half or full height.", "android": "A bottom sheet with a drag handle."},
+    "search": {"name": "Search", "ios": "A search tab, or a search field in the top bar.", "android": "A search bar at the top: a pill with the menu icon and your picture outside it."},
+    "account": {"name": "Account", "ios": "A top-bar button that opens a sheet or menu.", "android": "Your picture in the search bar or top bar, opening a menu or sheet."}
+  },
+  "prototype": {
+    "views": "Views of this check",
+    "tabReport": "Report",
+    "tabProto": "Prototype",
+    "note": "Before is the web prototype as it is today. After is the same screen with this report's {phone} fixes applied in a browser, then photographed. It is a mock-up for reviewing the direction, not a native {phone} build, and nothing in the app was changed.",
+    "screens": "Screens",
+    "which": "Which design to show",
+    "before": "Before",
+    "beforeSub": "Today’s design",
+    "after": "After",
+    "afterSub": "With the recommended changes",
+    "both": "Both",
+    "prev": "Previous screen",
+    "next": "Next screen",
+    "list": "Problems on this screen",
+    "shown": "Shown in the After design",
+    "hidden": "Not shown in the After design",
+    "today": "Today",
+    "change": "In the After design",
+    "more": "Read the full write-up",
+    "door": "See before and after",
+    "problem": "Problem",
+    "fix": "Fix",
+    "pos": "{i} of {n}",
+    "sum": "Problems listed for this screen: {n}. Shown in the After design: {k}.",
+    "sumRest": " Not shown: {m}.",
+    "hintBoth": "Pick a number on either phone to read about it.",
+    "hintTap": "Tap the phone to flip between Before and After.",
+    "hintClick": "Click the phone to flip between Before and After, or hold the mouse down for a quick look.",
+    "hintPick": "Pick a number to read about it.",
+    "tight": " Tap areas that still fall short for lack of room: {n}.",
+    "absent": "This part of the screen isn't visible in this view.",
+    "none": "This fix isn't drawn in the prototype yet."
+  },
+  "skipped": {
+    "IOS-GLS-03": "Needs a real iPhone at every glass setting.",
+    "IOS-MNU-02": "Needs menus opened on a real iPhone.",
+    "_default": "No screen had what this check needs."
+  }
+}

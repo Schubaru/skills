@@ -1,0 +1,76 @@
+{
+  "name": "doodleshoe",
+  "owner": {
+    "name": "Alex Schumacher",
+    "url": "https://nooblabs.vercel.app"
+  },
+  "metadata": {
+    "description": "Claude Code skills by Alex Schumacher, design engineer.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "deviceroy",
+      "description": "Screen-by-screen iOS 27 vs Android 17 platform audit, published as plain-language report pages.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/deviceroy"
+      ]
+    },
+    {
+      "name": "ui-surgeon",
+      "description": "A short, reviewable checklist of the UI changes you just made, ready to hand off.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/ui-surgeon"
+      ]
+    },
+    {
+      "name": "key-components",
+      "description": "Builds or reverse-engineers a complete design system: tokens, components, stories, docs.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/key-components"
+      ]
+    },
+    {
+      "name": "test-mite",
+      "description": "Deterministic routing tests: Playwright coverage of every route, plus a findings report.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/test-mite"
+      ]
+    },
+    {
+      "name": "app-store",
+      "description": "Audits an iOS app against Apple's current review guidelines, fixes what it safely can, reports the rest.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/app-store"
+      ]
+    },
+    {
+      "name": "noob-inc",
+      "description": "Deploys N00B Inc into your own accounts: a pixel office and board for your Claude Code agents, with an inbox for their permission prompts.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/noob-inc"
+      ]
+    },
+    {
+      "name": "last-push",
+      "description": "Your latest git push as a short, Slack-ready bullet list.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/last-push"
+      ]
+    }
+  ]
+}

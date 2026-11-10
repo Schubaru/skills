@@ -1,0 +1,64 @@
+{
+  "app": "my-app",
+  "stack": "auto",
+  "scope": {
+    "mode": "all",
+    "routes": [],
+    "include": []
+  },
+  "sources": {
+    "native": {
+      "ios": false,
+      "android": false
+    },
+    "prototypeUrl": "http://localhost:5173{route}",
+    "canvasManifest": null
+  },
+  "native": {
+    "ios": {
+      "scheme": null
+    },
+    "android": {
+      "scheme": null,
+      "density": 2.625
+    },
+    "settleSeconds": 2
+  },
+  "web": {
+    "hideSelectors": [],
+    "deviceScaleFactor": 1,
+    "settleMs": 600,
+    "freezeTime": null
+  },
+  "devices": {
+    "ios": {
+      "model": "iPhone 17 Pro",
+      "os": "27.0"
+    },
+    "android": {
+      "model": "Pixel 10",
+      "api": 37
+    }
+  },
+  "appearance": [
+    "light"
+  ],
+  "fontScale": 1.0,
+  "chrome": [],
+  "tabRoutes": [],
+  "ignoreSources": [],
+  "targetStack": "rn-expo",
+  "brandExceptions": [],
+  "ruleCatalogVersion": "1.1.0",
+  "prototype": {
+    "enabled": true,
+    "skin": {}
+  },
+  "report": {
+    "name": null,
+    "appName": null,
+    "screens": [],
+    "artifacts": {}
+  },
+  "screenSources": {}
+}

@@ -1,0 +1,527 @@
+{
+  "IOS-NAV-01": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    },
+    "web": {
+      "code": "const os = usePlatform(); // 'ios' | 'android', e.g. from ?os=\nreturn os === 'android' ? (\n  <nav className=\"fixed inset-x-0 bottom-0 flex h-16 justify-around\">\n    {tabs.map((t) => <NavItem key={t.to} {...t} icon={t.md} indicator=\"pill\" />)}\n  </nav>\n) : (\n  <nav className=\"fixed inset-x-4 bottom-4 mx-auto w-fit rounded-full backdrop-blur-xl\">\n    {tabs.slice(0, 5).map((t) => <TabItem key={t.to} {...t} icon={t.sf} />)}\n  </nav>\n);",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-NAV-01": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    },
+    "web": {
+      "code": "const os = usePlatform(); // 'ios' | 'android', e.g. from ?os=\nreturn os === 'android' ? (\n  <nav className=\"fixed inset-x-0 bottom-0 flex h-16 justify-around\">\n    {tabs.map((t) => <NavItem key={t.to} {...t} icon={t.md} indicator=\"pill\" />)}\n  </nav>\n) : (\n  <nav className=\"fixed inset-x-4 bottom-4 mx-auto w-fit rounded-full backdrop-blur-xl\">\n    {tabs.slice(0, 5).map((t) => <TabItem key={t.to} {...t} icon={t.sf} />)}\n  </nav>\n);",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "X-PAR-01": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    },
+    "web": {
+      "code": "// One platform dimension for the prototype, read once, passed to chrome only:\nexport function usePlatform(): 'ios' | 'android' {\n  const [params] = useSearchParams();\n  return params.get('os') === 'android' ? 'android' : 'ios';\n}"
+    }
+  },
+  "IOS-NAV-02": {
+    "rn-expo": {
+      "code": "<NativeTabs>\n  {/* <= 5 destinations; a special one (cart) takes the prominent role on iOS 27 */}\n  <NativeTabs.Trigger name=\"index\">…</NativeTabs.Trigger>\n</NativeTabs>\n// Move actions (\"New\", \"Compose\") out of the tab bar into header items.",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        }
+      ],
+      "upgrade": "expo-router >= 55"
+    }
+  },
+  "IOS-NAV-04": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    },
+    "web": {
+      "code": "const os = usePlatform(); // 'ios' | 'android', e.g. from ?os=\nreturn os === 'android' ? (\n  <nav className=\"fixed inset-x-0 bottom-0 flex h-16 justify-around\">\n    {tabs.map((t) => <NavItem key={t.to} {...t} icon={t.md} indicator=\"pill\" />)}\n  </nav>\n) : (\n  <nav className=\"fixed inset-x-4 bottom-4 mx-auto w-fit rounded-full backdrop-blur-xl\">\n    {tabs.slice(0, 5).map((t) => <TabItem key={t.to} {...t} icon={t.sf} />)}\n  </nav>\n);",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-NAV-05": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    },
+    "web": {
+      "code": "const os = usePlatform(); // 'ios' | 'android', e.g. from ?os=\nreturn os === 'android' ? (\n  <nav className=\"fixed inset-x-0 bottom-0 flex h-16 justify-around\">\n    {tabs.map((t) => <NavItem key={t.to} {...t} icon={t.md} indicator=\"pill\" />)}\n  </nav>\n) : (\n  <nav className=\"fixed inset-x-4 bottom-4 mx-auto w-fit rounded-full backdrop-blur-xl\">\n    {tabs.slice(0, 5).map((t) => <TabItem key={t.to} {...t} icon={t.sf} />)}\n  </nav>\n);",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-NAV-05": {
+    "rn-expo": {
+      "code": "// Let the Stack own back: no headerLeft, no BackHandler listener.\n<Stack.Screen name=\"settings\" options={{ title: 'Settings' }} />\n\n// Guarding unsaved changes? Use usePreventRemove, which keeps predictive back.\nusePreventRemove(hasUnsavedChanges, ({ data }) => confirmDiscard(data.action));",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "Stack"
+        },
+        {
+          "pkg": "@react-navigation/native",
+          "symbol": "usePreventRemove"
+        }
+      ],
+      "upgrade": "@react-navigation/native >= 7"
+    },
+    "web": {
+      "code": "const os = usePlatform();\n<button aria-label=\"Back\" className=\"min-h-11 min-w-11\" onClick={() => navigate(-1)}>\n  {os === 'android' ? <MaterialSymbol name=\"arrow_back\" /> : <SFSymbol name=\"chevron.backward\" />}\n</button>\n// iOS: chevron alone, its own glass group; Android: arrow_back at the app bar's start.",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-NAV-04": {
+    "rn-expo": {
+      "code": "// Let the Stack own back: no headerLeft, no BackHandler listener.\n<Stack.Screen name=\"settings\" options={{ title: 'Settings' }} />\n\n// Guarding unsaved changes? Use usePreventRemove, which keeps predictive back.\nusePreventRemove(hasUnsavedChanges, ({ data }) => confirmDiscard(data.action));",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "Stack"
+        },
+        {
+          "pkg": "@react-navigation/native",
+          "symbol": "usePreventRemove"
+        }
+      ],
+      "upgrade": "@react-navigation/native >= 7"
+    },
+    "web": {
+      "code": "const os = usePlatform();\n<button aria-label=\"Back\" className=\"min-h-11 min-w-11\" onClick={() => navigate(-1)}>\n  {os === 'android' ? <MaterialSymbol name=\"arrow_back\" /> : <SFSymbol name=\"chevron.backward\" />}\n</button>\n// iOS: chevron alone, its own glass group; Android: arrow_back at the app bar's start.",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-BAR-01": {
+    "rn-expo": {
+      "code": "<Stack.Screen\n  options={{\n    headerTransparent: true, // let content scroll under the bar; iOS adds glass + edge effect\n    headerBlurEffect: 'systemChromeMaterial',\n  }}\n/>",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "Stack"
+        },
+        {
+          "pkg": "react-native-screens",
+          "symbol": "headerBlurEffect"
+        }
+      ]
+    },
+    "web": {
+      "code": "// iOS variant: transparent bar over content, a soft fade at the edge, no opaque fill.\n<header className=\"sticky top-0 bg-gradient-to-b from-canvas/80 to-transparent\">…</header>",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-BAR-02": {
+    "rn-expo": {
+      "code": "<Stack.Screen\n  options={{\n    headerRight: () => (\n      <View style={{ flexDirection: 'row', gap: 8 }}>\n        <ShareButton />{/* the one critical action stays pinned */}\n        <OverflowMenu actions={secondaryActions} />{/* native menu per platform */}\n      </View>\n    ),\n  }}\n/>",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "Stack"
+        }
+      ]
+    },
+    "web": {
+      "code": "const [pinned, ...rest] = actions;              // keep the critical action visible\n<div className=\"flex items-center gap-1\">\n  <IconButton {...pinned} />\n  {rest.length > 2 ? <OverflowMenu actions={rest} /> : rest.map((a) => <IconButton key={a.id} {...a} />)}\n</div>",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-BAR-01": {
+    "rn-expo": {
+      "code": "<Stack.Screen\n  options={{\n    headerRight: () => (\n      <View style={{ flexDirection: 'row', gap: 8 }}>\n        <ShareButton />{/* the one critical action stays pinned */}\n        <OverflowMenu actions={secondaryActions} />{/* native menu per platform */}\n      </View>\n    ),\n  }}\n/>",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "Stack"
+        }
+      ]
+    },
+    "web": {
+      "code": "const [pinned, ...rest] = actions;              // keep the critical action visible\n<div className=\"flex items-center gap-1\">\n  <IconButton {...pinned} />\n  {rest.length > 2 ? <OverflowMenu actions={rest} /> : rest.map((a) => <IconButton key={a.id} {...a} />)}\n</div>",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-GLS-01": {
+    "web": {
+      "code": "// One glass layer per stack: keep the bar's blur, drop the child's.\n<nav className=\"backdrop-blur-xl …\">\n  <button className=\"bg-white/60 …\">   {/* was: backdrop-blur-md */}\n</nav>"
+    }
+  },
+  "IOS-MNU-03": {
+    "rn-expo": {
+      "code": "import { Host, ContextMenu, Button } from '@expo/ui/swift-ui';\n<Host matchContents>\n  <ContextMenu>\n    <ContextMenu.Items>\n      <Button systemImage=\"calendar\" onPress={() => setSort('date')}>Date</Button>\n      <Button systemImage=\"textformat\" onPress={() => setSort('name')}>Name</Button>\n    </ContextMenu.Items>\n    <ContextMenu.Trigger><Button systemImage=\"arrow.up.arrow.down\">Sort</Button></ContextMenu.Trigger>\n  </ContextMenu>\n</Host>",
+      "requires": [
+        {
+          "pkg": "@expo/ui",
+          "symbol": "ContextMenu"
+        },
+        {
+          "pkg": "@expo/ui",
+          "symbol": "Host"
+        }
+      ],
+      "upgrade": "@expo/ui (stable in Expo SDK 56)"
+    },
+    "web": {
+      "code": "const os = usePlatform();\n{os === 'ios'\n  ? <GlassPullDown anchor={trigger} items={items} />      // glass, morphs from its trigger\n  : <M3VerticalMenu anchor={trigger} groups={groups} />} // 16dp radius, grouped sections\n// Selection lists: aria-checked + a checkmark on the current value (both platforms).",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-MNU-02": {
+    "rn-expo": {
+      "code": "import { Host, DropdownMenu, DropdownMenuItem } from '@expo/ui/jetpack-compose';\n\n<Host matchContents>\n  <DropdownMenu expanded={open} onDismissRequest={() => setOpen(false)}>\n    <DropdownMenuItem onClick={() => setSort('date')}>Date</DropdownMenuItem>\n    <DropdownMenuItem onClick={() => setSort('name')}>Name</DropdownMenuItem>\n  </DropdownMenu>\n</Host>",
+      "requires": [
+        {
+          "pkg": "@expo/ui",
+          "symbol": "DropdownMenu"
+        },
+        {
+          "pkg": "@expo/ui",
+          "symbol": "DropdownMenuItem"
+        }
+      ],
+      "upgrade": "@expo/ui/jetpack-compose (stable in Expo SDK 56)"
+    },
+    "web": {
+      "code": "const os = usePlatform();\n{os === 'ios'\n  ? <GlassPullDown anchor={trigger} items={items} />      // glass, morphs from its trigger\n  : <M3VerticalMenu anchor={trigger} groups={groups} />} // 16dp radius, grouped sections\n// Selection lists: aria-checked + a checkmark on the current value (both platforms).",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-MNU-04": {
+    "rn-expo": {
+      "code": "import { Host, Picker } from '@expo/ui/swift-ui';\n<Host matchContents>\n  <Picker\n    variant=\"menu\"\n    options={['Newest', 'Oldest', 'A to Z']}\n    selectedIndex={sortIndex}\n    onOptionSelected={({ nativeEvent }) => setSortIndex(nativeEvent.index)}\n  />\n</Host>",
+      "requires": [
+        {
+          "pkg": "@expo/ui",
+          "symbol": "Picker"
+        }
+      ],
+      "upgrade": "@expo/ui (stable in Expo SDK 56)"
+    },
+    "web": {
+      "code": "<div role=\"radiogroup\" aria-label=\"Sort\">\n  {options.map((o) => (\n    <button key={o} role=\"radio\" aria-checked={o === value} onClick={() => setValue(o)}>\n      {o === value && <CheckIcon aria-hidden />} {o}\n    </button>\n  ))}\n</div>"
+    }
+  },
+  "AND-MNU-04": {
+    "rn-expo": {
+      "code": "import { Host, DropdownMenu, DropdownMenuItem } from '@expo/ui/jetpack-compose';\n\n<Host matchContents>\n  <DropdownMenu expanded={open} onDismissRequest={() => setOpen(false)}>\n    <DropdownMenuItem onClick={() => setSort('date')}>Date</DropdownMenuItem>\n    <DropdownMenuItem onClick={() => setSort('name')}>Name</DropdownMenuItem>\n  </DropdownMenu>\n</Host>",
+      "requires": [
+        {
+          "pkg": "@expo/ui",
+          "symbol": "DropdownMenu"
+        },
+        {
+          "pkg": "@expo/ui",
+          "symbol": "DropdownMenuItem"
+        }
+      ],
+      "upgrade": "@expo/ui/jetpack-compose (stable in Expo SDK 56)"
+    },
+    "web": {
+      "code": "<div role=\"radiogroup\" aria-label=\"Sort\">\n  {options.map((o) => (\n    <button key={o} role=\"radio\" aria-checked={o === value} onClick={() => setValue(o)}>\n      {o === value && <CheckIcon aria-hidden />} {o}\n    </button>\n  ))}\n</div>"
+    }
+  },
+  "IOS-MNU-06": {
+    "rn-expo": {
+      "code": "import { Alert } from 'react-native';\n\nAlert.alert('Delete message?', 'This cannot be undone.', [\n  { text: 'Cancel', style: 'cancel' },\n  { text: 'Delete', style: 'destructive', onPress: remove },\n]);",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "Alert"
+        }
+      ]
+    },
+    "web": {
+      "code": "{usePlatform() === 'ios'\n  ? <IOSAlert title=\"Delete message?\" actions={[{ label: 'Cancel' }, { label: 'Delete', destructive: true }]} />\n  : <M3Dialog title=\"Delete message?\" confirm=\"Delete\" dismiss=\"Cancel\" />}",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-MNU-01": {
+    "rn-expo": {
+      "code": "import { ActionSheetIOS, Platform } from 'react-native';\nfunction showOptions() {\n  if (Platform.OS === 'ios') {\n    ActionSheetIOS.showActionSheetWithOptions(\n      { options: ['Cancel', 'Share', 'Delete'], cancelButtonIndex: 0, destructiveButtonIndex: 2 },\n      onPick,\n    );\n  } else {\n    setMenuOpen(true); // Android: anchored M3 DropdownMenu (see AND-MNU-02)\n  }\n}",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "ActionSheetIOS"
+        }
+      ]
+    },
+    "web": {
+      "code": "const os = usePlatform();\n{os === 'ios'\n  ? <GlassPullDown anchor={trigger} items={items} />      // glass, morphs from its trigger\n  : <M3VerticalMenu anchor={trigger} groups={groups} />} // 16dp radius, grouped sections\n// Selection lists: aria-checked + a checkmark on the current value (both platforms).",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-MNU-03": {
+    "rn-expo": {
+      "code": "import { Platform } from 'react-native';\nimport { Ionicons } from '@expo/vector-icons';\n\n<Ionicons\n  name={Platform.OS === 'android' ? 'ellipsis-vertical' : 'ellipsis-horizontal'}\n  size={24}\n  accessibilityLabel=\"More options\"\n/>",
+      "requires": [
+        {
+          "pkg": "@expo/vector-icons",
+          "symbol": "Ionicons"
+        }
+      ]
+    },
+    "web": {
+      "code": "<button aria-label=\"More options\" aria-haspopup=\"menu\" className=\"min-h-11 min-w-11\">\n  {usePlatform() === 'android'\n    ? <MaterialSymbol name=\"more_vert\" />\n    : <SFSymbol name=\"ellipsis\" />}\n</button>",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-SHT-01": {
+    "rn-expo": {
+      "code": "// app/_layout.tsx: present the route as a system sheet\n<Stack.Screen\n  name=\"filters\"\n  options={{\n    presentation: 'formSheet',\n    sheetAllowedDetents: [0.5, 1],\n    sheetGrabberVisible: true,\n  }}\n/>",
+      "requires": [
+        {
+          "pkg": "react-native-screens",
+          "symbol": "sheetAllowedDetents"
+        }
+      ],
+      "upgrade": "react-native-screens >= 4 (Expo SDK 52+)"
+    },
+    "web": {
+      "code": "{usePlatform() === 'ios'\n  ? <Sheet inset detents={['medium', 'large']} grabber />  // inset glass at partial height\n  : <Sheet fullWidth dragHandle topRadius={28} />}         // M3 modal bottom sheet",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "AND-SHT-01": {
+    "rn-expo": {
+      "code": "// app/_layout.tsx: present the route as a system sheet\n<Stack.Screen\n  name=\"filters\"\n  options={{\n    presentation: 'formSheet',\n    sheetAllowedDetents: [0.5, 1],\n    sheetGrabberVisible: true,\n  }}\n/>",
+      "requires": [
+        {
+          "pkg": "react-native-screens",
+          "symbol": "sheetAllowedDetents"
+        }
+      ],
+      "upgrade": "react-native-screens >= 4 (Expo SDK 52+)"
+    },
+    "web": {
+      "code": "{usePlatform() === 'ios'\n  ? <Sheet inset detents={['medium', 'large']} grabber />  // inset glass at partial height\n  : <Sheet fullWidth dragHandle topRadius={28} />}         // M3 modal bottom sheet",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "X-PAR-05": {
+    "rn-expo": {
+      "code": "import { Alert } from 'react-native';\n\nAlert.alert('Delete message?', 'This cannot be undone.', [\n  { text: 'Cancel', style: 'cancel' },\n  { text: 'Delete', style: 'destructive', onPress: remove },\n]);",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "Alert"
+        }
+      ]
+    },
+    "web": {
+      "code": "{usePlatform() === 'ios'\n  ? <IOSAlert title=\"Delete message?\" actions={[{ label: 'Cancel' }, { label: 'Delete', destructive: true }]} />\n  : <M3Dialog title=\"Delete message?\" confirm=\"Delete\" dismiss=\"Cancel\" />}",
+      "note": "Prototype sketch: usePlatform() and the chrome components are placeholders for your own."
+    }
+  },
+  "IOS-TYP-01": {
+    "rn-expo": {
+      "code": "// Remove allowFontScaling={false}; let Dynamic Type scale text.\n<Text style={styles.body} maxFontSizeMultiplier={1.6}>\n  {label}\n</Text>"
+    },
+    "web": {
+      "code": "// Arbitrary px sizes don't follow the user's text size. Use the rem scale:\n<p className=\"text-sm\">…</p>          // was text-[13px]\n// iOS WebKit: font: -apple-system-body on the root honors Dynamic Type."
+    }
+  },
+  "IOS-TGT-01": {
+    "rn-expo": {
+      "code": "import { Platform, Pressable } from 'react-native';\nconst MIN = Platform.OS === 'ios' ? 44 : 48;\n\n<Pressable hitSlop={8} style={{ minWidth: MIN, minHeight: MIN, alignItems: 'center', justifyContent: 'center' }}>\n  <Icon />\n</Pressable>",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "Pressable"
+        }
+      ]
+    },
+    "web": {
+      "code": "// Keep the glyph small, grow the hit area:\n<button className=\"grid min-h-11 min-w-11 place-items-center\">  {/* 44px iOS */}\n  <Icon className=\"size-5\" />\n</button>\n// Android variant: min-h-12 min-w-12 (48dp)."
+    }
+  },
+  "AND-TGT-01": {
+    "rn-expo": {
+      "code": "import { Platform, Pressable } from 'react-native';\nconst MIN = Platform.OS === 'ios' ? 44 : 48;\n\n<Pressable hitSlop={8} style={{ minWidth: MIN, minHeight: MIN, alignItems: 'center', justifyContent: 'center' }}>\n  <Icon />\n</Pressable>",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "Pressable"
+        }
+      ]
+    },
+    "web": {
+      "code": "// Keep the glyph small, grow the hit area:\n<button className=\"grid min-h-11 min-w-11 place-items-center\">  {/* 44px iOS */}\n  <Icon className=\"size-5\" />\n</button>\n// Android variant: min-h-12 min-w-12 (48dp)."
+    }
+  },
+  "IOS-LAY-01": {
+    "rn-expo": {
+      "code": "import { useSafeAreaInsets } from 'react-native-safe-area-context';\n\nconst insets = useSafeAreaInsets();\n<View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}>\n  {children}\n</View>\n// app.json: remove \"edgeToEdgeEnabled\": false (ignored on Android 16+ at API 36).",
+      "requires": [
+        {
+          "pkg": "react-native-safe-area-context",
+          "symbol": "useSafeAreaInsets"
+        }
+      ]
+    },
+    "web": {
+      "code": "<header className=\"pt-[max(3.5rem,env(safe-area-inset-top))]\">…</header>\n<nav className=\"pb-[max(2.125rem,env(safe-area-inset-bottom))]\">…</nav>\n// 59pt top / 34pt bottom on Dynamic Island iPhones: controls start below/above."
+    }
+  },
+  "AND-EDG-01": {
+    "rn-expo": {
+      "code": "import { useSafeAreaInsets } from 'react-native-safe-area-context';\n\nconst insets = useSafeAreaInsets();\n<View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}>\n  {children}\n</View>\n// app.json: remove \"edgeToEdgeEnabled\": false (ignored on Android 16+ at API 36).",
+      "requires": [
+        {
+          "pkg": "react-native-safe-area-context",
+          "symbol": "useSafeAreaInsets"
+        }
+      ]
+    }
+  },
+  "AND-NAV-03": {
+    "rn-expo": {
+      "code": "import { useWindowDimensions } from 'react-native';\n\nexport default function Layout() {\n  const { width } = useWindowDimensions();\n  return width >= 600 ? <RailLayout /> : <TabLayout />; // Android 17 large screens\n}",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "useWindowDimensions"
+        }
+      ]
+    },
+    "web": {
+      "code": "<nav className=\"fixed inset-x-0 bottom-0 md:inset-y-0 md:left-0 md:right-auto md:w-20 md:flex-col\">\n  {tabs.map((t) => <NavItem key={t.to} {...t} />)}\n</nav>  {/* bar under 600dp, rail at 600dp+ */}"
+    }
+  },
+  "X-PAR-02": {
+    "rn-expo": {
+      "code": "// components/OverflowMenu.ios.tsx      -> @expo/ui/swift-ui ContextMenu\n// components/OverflowMenu.android.tsx  -> @expo/ui/jetpack-compose DropdownMenu\n// Metro resolves the platform file from one import:\nimport { OverflowMenu } from '@/components/OverflowMenu';"
+    },
+    "web": {
+      "code": "// One platform dimension for the prototype, read once, passed to chrome only:\nexport function usePlatform(): 'ios' | 'android' {\n  const [params] = useSearchParams();\n  return params.get('os') === 'android' ? 'android' : 'ios';\n}"
+    }
+  },
+  "AND-CTL-01": {
+    "rn-expo": {
+      "code": "import { Switch } from 'react-native';\n\n// Renders UISwitch on iOS and the Material switch on Android.\n<Switch value={enabled} onValueChange={setEnabled} />",
+      "requires": [
+        {
+          "pkg": "react-native",
+          "symbol": "Switch"
+        }
+      ]
+    }
+  },
+  "AND-DYN-01": {
+    "rn-expo": {
+      "code": "import { useMaterialColors } from '@expo/ui/jetpack-compose';\n\nconst colors = useMaterialColors(); // Material You palette on Android 12+\n<TabBar tint={colors.primary} background={colors.surfaceContainer} />",
+      "requires": [
+        {
+          "pkg": "@expo/ui",
+          "symbol": "useMaterialColors"
+        }
+      ],
+      "upgrade": "@expo/ui/jetpack-compose (Expo SDK 56)"
+    }
+  },
+  "IOS-ICN-01": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    }
+  },
+  "AND-ICN-01": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    }
+  },
+  "X-PAR-04": {
+    "rn-expo": {
+      "code": "import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';\nexport default function TabLayout() {\n  return (\n    <NativeTabs>\n      <NativeTabs.Trigger name=\"index\">\n        <Icon sf=\"house.fill\" md=\"home\" />\n        <Label>Home</Label>\n      </NativeTabs.Trigger>\n    </NativeTabs>\n  );\n}",
+      "requires": [
+        {
+          "pkg": "expo-router",
+          "symbol": "NativeTabs"
+        },
+        {
+          "pkg": "expo-router",
+          "symbol": "Icon"
+        }
+      ],
+      "upgrade": "expo-router >= 55 (Expo SDK 55+; NativeTabs is beta)"
+    }
+  }
+}
